@@ -932,7 +932,7 @@ textarea {
 .auth-back .material-icons-round { font-size: 14px !important; }
 
 .gradient-text {
-  background: linear-gradient(135deg, var(--accent-green), var(--accent-teal));
+  background: linear-gradient(135deg, #E9C46A, #F4A261, #E76F51);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -952,23 +952,21 @@ textarea {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
   display: flex; align-items: center; justify-content: space-between;
   padding: 18px 60px;
-  background: rgba(10,15,20,0.8);
+  background: rgba(15,25,20,0.75);
   backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--glass-border);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
 .nav-brand {
   display: flex; align-items: center; gap: 10px;
   font-size: 20px; font-weight: 800;
-  background: linear-gradient(135deg, var(--accent-green), var(--accent-teal));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #fff;
+  -webkit-text-fill-color: #fff;
 }
 .nav-brand .material-icons-round {
-  font-size: 26px; color: var(--accent-green);
-  -webkit-text-fill-color: var(--accent-green);
-  filter: drop-shadow(0 0 8px rgba(74,222,128,0.5));
+  font-size: 26px; color: #E9C46A;
+  -webkit-text-fill-color: #E9C46A;
+  filter: drop-shadow(0 0 8px rgba(233,196,106,0.6));
 }
 
 .nav-links { display: flex; align-items: center; gap: 12px; }
@@ -1005,24 +1003,26 @@ textarea {
 .hero-badge {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 6px 14px; border-radius: 20px;
-  background: rgba(74,222,128,0.1);
-  border: 1px solid rgba(74,222,128,0.25);
-  font-size: 12px; font-weight: 600; color: var(--accent-green);
+  background: rgba(233,196,106,0.15);
+  border: 1px solid rgba(233,196,106,0.4);
+  font-size: 12px; font-weight: 600; color: #E9C46A;
   margin-bottom: 24px;
 }
 .hero-badge .material-icons-round { font-size: 14px !important; }
 
 .hero-title {
   font-size: 68px; font-weight: 900;
-  line-height: 1.1; color: var(--text-primary);
+  line-height: 1.1; color: #ffffff;
   margin-bottom: 20px;
   letter-spacing: -1.5px;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.4);
 }
 
 .hero-subtitle {
-  font-size: 18px; color: var(--text-secondary);
+  font-size: 18px; color: rgba(255,255,255,0.85);
   line-height: 1.7; margin-bottom: 36px;
   max-width: 520px;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.3);
 }
 
 .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; }
@@ -1038,8 +1038,8 @@ textarea {
 .hero-card {
   display: flex; align-items: center; gap: 14px;
   padding: 16px 20px;
-  background: rgba(21,29,39,0.9);
-  border: 1px solid var(--glass-border);
+  background: rgba(15,25,20,0.85);
+  border: 1px solid rgba(255,255,255,0.15);
   border-radius: var(--radius);
   backdrop-filter: blur(10px);
   animation: float 4s ease-in-out infinite;
@@ -1056,8 +1056,8 @@ textarea {
   50%       { transform: translateY(-8px); }
 }
 
-.hc-value { font-size: 18px; font-weight: 700; color: var(--text-primary); }
-.hc-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.hc-value { font-size: 18px; font-weight: 700; color: #ffffff; }
+.hc-label { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 2px; }
 
 /* Features */
 .features {
@@ -1084,7 +1084,7 @@ textarea {
   transition: all var(--transition);
 }
 .feature-card:hover {
-  border-color: rgba(255,255,255,0.15);
+  border-color: rgba(45,106,79,0.3);
   transform: translateY(-4px);
   box-shadow: var(--shadow-md);
 }
