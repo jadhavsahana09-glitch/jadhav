@@ -29,13 +29,103 @@
         </div>
       </div>
 
-      <!-- Amount -->
-      <div class="form-group">
-        <label for="amount">CO₂ Amount <small>(kg)</small></label>
-        <div class="input-wrapper">
+      <!-- Dynamic Calculator Inputs -->
+      <div id="dynamicInputs" class="dynamic-calculator" style="margin-bottom: 20px;">
+        <!-- Transport Input (ID 1) -->
+        <div id="inputGroup_1" class="calc-group" style="display:none;">
+          <div class="form-group">
+            <label>Mode of Transport</label>
+            <div class="input-wrapper">
+              <span class="material-icons-round input-icon">directions_car</span>
+              <select id="transportMode" style="width: 100%; border: none; background: transparent; padding: 12px 16px 12px 42px; outline: none; font-family: inherit; font-size: 1rem;">
+                <option value="0.21">Car (0.21 kg/km)</option>
+                <option value="0.09">Bus (0.09 kg/km)</option>
+                <option value="0.04">Train (0.04 kg/km)</option>
+                <option value="0.25">Flight (0.25 kg/km)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Distance <small>(km)</small></label>
+            <div class="input-wrapper">
+              <span class="material-icons-round input-icon">route</span>
+              <input type="number" id="transportDistance" step="1" min="0" placeholder="e.g. 15" class="calc-trigger" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Energy Input (ID 2) -->
+        <div id="inputGroup_2" class="calc-group" style="display:none;">
+          <div class="form-group">
+            <label>Electricity Usage <small>(kWh)</small></label>
+            <div class="input-wrapper">
+              <span class="material-icons-round input-icon">bolt</span>
+              <input type="number" id="energyUsage" step="1" min="0" placeholder="e.g. 50" class="calc-trigger" />
+            </div>
+            <small style="color:#94a3b8; display:block; margin-top:4px;">Avg 0.23 kg per kWh</small>
+          </div>
+        </div>
+
+        <!-- Food Input (ID 3) -->
+        <div id="inputGroup_3" class="calc-group" style="display:none;">
+          <div class="form-group">
+            <label>Diet / Meal Type</label>
+            <div class="input-wrapper">
+              <span class="material-icons-round input-icon">restaurant</span>
+              <select id="foodType" style="width: 100%; border: none; background: transparent; padding: 12px 16px 12px 42px; outline: none; font-family: inherit; font-size: 1rem;">
+                <option value="6.61">Beef / Heavy Meat (6.61 kg/meal)</option>
+                <option value="1.36">Chicken / Light Meat (1.36 kg/meal)</option>
+                <option value="1.0">Vegetarian (1.0 kg/meal)</option>
+                <option value="0.7">Vegan (0.7 kg/meal)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Number of Meals</label>
+            <div class="input-wrapper">
+              <span class="material-icons-round input-icon">tag</span>
+              <input type="number" id="foodMeals" step="1" min="1" value="1" class="calc-trigger" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Shopping Input (ID 4) -->
+        <div id="inputGroup_4" class="calc-group" style="display:none;">
+          <div class="form-group">
+            <label>Shopping Spending <small>($)</small></label>
+            <div class="input-wrapper">
+              <span class="material-icons-round input-icon">shopping_bag</span>
+              <input type="number" id="shoppingAmount" step="1" min="0" placeholder="e.g. 100" class="calc-trigger" />
+            </div>
+            <small style="color:#94a3b8; display:block; margin-top:4px;">Avg 0.3 kg per $10 spent</small>
+          </div>
+        </div>
+
+        <!-- Waste Input (ID 5) -->
+        <div id="inputGroup_5" class="calc-group" style="display:none;">
+          <div class="form-group">
+            <label>Trash Bags</label>
+            <div class="input-wrapper">
+              <span class="material-icons-round input-icon">delete_sweep</span>
+              <input type="number" id="wasteBags" step="1" min="0" placeholder="e.g. 2" class="calc-trigger" />
+            </div>
+            <small style="color:#94a3b8; display:block; margin-top:4px;">Avg 1.5 kg per bag</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Amount (Calculated or Manual) -->
+      <div class="form-group" style="background:#f8fafc; padding:15px; border-radius:10px; border:1px solid #e2e8f0; margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <label for="amount" style="margin:0;">Total CO₂ Amount <small>(kg)</small></label>
+          <label style="font-size:13px; color:#64748b; display:flex; align-items:center; gap:6px; cursor:pointer;">
+            <input type="checkbox" id="manualToggle" style="accent-color: #10b981; width:16px; height:16px;" /> Manual Entry
+          </label>
+        </div>
+        <div class="input-wrapper" id="amountWrapper">
           <span class="material-icons-round input-icon">scale</span>
           <input type="number" id="amount" name="amount" step="0.001" min="0.001"
-                 placeholder="e.g. 2.5" required />
+                 placeholder="0.000" required readonly style="background-color: #e2e8f0; font-weight:bold; color: #0f172a;" />
           <span class="input-suffix">kg CO₂</span>
         </div>
       </div>
