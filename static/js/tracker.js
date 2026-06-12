@@ -1,5 +1,5 @@
-/**
- * tracker.js — EcoTrack
+﻿/**
+ * tracker.js — Carby Control
  * Emission Tracker page interactions
  */
 

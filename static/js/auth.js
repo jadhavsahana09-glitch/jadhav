@@ -1,5 +1,5 @@
-/**
- * auth.js — EcoTrack
+﻿/**
+ * auth.js — Carby Control
  * Login & Register page interactions
  */
 

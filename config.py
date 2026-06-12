@@ -1,8 +1,8 @@
-import os
+﻿import os
 
 class Config:
     # Flask
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'ecotrack-otp-secret-2024')
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'Carby Control-otp-secret-2024')
 
     # Vercel Postgres
     POSTGRES_URL   = os.environ.get('POSTGRES_URL')

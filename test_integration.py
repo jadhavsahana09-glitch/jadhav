@@ -1,4 +1,4 @@
-import urllib.request
+﻿import urllib.request
 import urllib.parse
 import sqlite3
 import sys
@@ -35,7 +35,7 @@ try:
 
     print("1. Accessing Landing Page...")
     html = opener.open(BASE_URL).read().decode('utf-8')
-    assert "EcoTrack" in html, "EcoTrack landing page not loaded"
+    assert "Carby Control" in html, "Carby Control landing page not loaded"
     print("   [PASSED]")
 
     print("2. Submitting Registration for Alice...")

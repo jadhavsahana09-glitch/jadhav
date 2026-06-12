@@ -1,5 +1,5 @@
-"""
-EcoTrack — Carbon Footprint Web Application
+﻿"""
+Carby Control — Carbon Footprint Web Application
 Flask Backend with OTP Authentication (Email / Phone)
 """
 
@@ -407,8 +407,8 @@ def send_email_otp(to_email: str, otp: str) -> bool:
         return False
 
     msg             = MIMEMultipart('alternative')
-    msg['Subject']  = '🌱 Your EcoTrack Login OTP'
-    msg['From']     = f'EcoTrack <{from_email}>'
+    msg['Subject']  = '🌱 Your Carby Control Login OTP'
+    msg['From']     = f'Carby Control <{from_email}>'
     msg['To']       = to_email
 
     html = f"""
@@ -418,14 +418,14 @@ def send_email_otp(to_email: str, otp: str) -> bool:
       <div style="text-align:center; margin-bottom:32px;">
         <span style="font-size:40px;">🌱</span>
         <h1 style="color:#4ade80; margin:8px 0 0; font-size:26px; letter-spacing:-0.5px;">
-          EcoTrack
+          Carby Control
         </h1>
       </div>
       <h2 style="font-size:20px; color:#e2e8f0; margin-bottom:8px;">
         Your one-time login code
       </h2>
       <p style="color:#94a3b8; margin-bottom:28px; font-size:14px; line-height:1.6;">
-        Use the code below to sign in to your EcoTrack account.
+        Use the code below to sign in to your Carby Control account.
         It expires in <strong style="color:#4ade80;">10 minutes</strong>.
       </p>
       <div style="background:#151d27; border:2px solid #4ade80; border-radius:12px;
@@ -463,7 +463,7 @@ def send_sms_otp(to_phone: str, otp: str) -> bool:
     try:
         client = Client(account_sid, auth_token)
         message = client.messages.create(
-            body=f"Your EcoTrack login code is: {otp}. It expires in 10 minutes.",
+            body=f"Your Carby Control login code is: {otp}. It expires in 10 minutes.",
             from_=from_phone,
             to=to_phone
         )
@@ -1081,7 +1081,7 @@ def download_pdf():
     doc    = SimpleDocTemplate(buf, pagesize=letter,
                                leftMargin=50, rightMargin=50, topMargin=60, bottomMargin=40)
     styles = getSampleStyleSheet(); elements = []
-    elements.append(Paragraph('🌱 EcoTrack — Carbon Footprint Report', styles['Title']))
+    elements.append(Paragraph('🌱 Carby Control — Carbon Footprint Report', styles['Title']))
     elements.append(Paragraph(f'User: {current_user.name}  |  Generated: {datetime.now().strftime("%Y-%m-%d %H:%M")}', styles['Normal']))
     elements.append(Spacer(1, 12))
     elements.append(Paragraph(f'<b>Total CO₂:</b> {float(stats["total"]):.2f} kg  |  <b>Entries:</b> {stats["count"]}', styles['Normal']))
