@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Create Account — EcoTrack{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+  <!-- Left panel -->
+  <div class="auth-panel auth-panel-left">
+    <div class="auth-brand">
+      <span class="material-icons-round">eco</span>
+      EcoTrack
+    </div>
+    <h1>Join the<br /><span class="gradient-text">green movement.</span></h1>
+    <p>Start tracking your carbon footprint today and take meaningful action for the planet.</p>
+    <ul class="auth-features">
+      <li><span class="material-icons-round">check_circle</span> Free account, forever</li>
+      <li><span class="material-icons-round">check_circle</span> Track 5 emission categories</li>
+      <li><span class="material-icons-round">check_circle</span> Download CSV & PDF reports</li>
+      <li><span class="material-icons-round">check_circle</span> Set custom reduction goals</li>
+    </ul>
+  </div>
+
+  <!-- Right panel -->
+  <div class="auth-panel auth-panel-right">
+    <div class="auth-card">
+      <h2>Create Account</h2>
+      <p class="auth-card-subtitle">Fill in your details to get started.</p>
+
+      <form method="POST" action="{{ url_for('register') }}" id="registerForm" novalidate>
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <div class="input-wrapper">
+            <span class="material-icons-round input-icon">person</span>
+            <input type="text" id="name" name="name" placeholder="Jane Doe" required autocomplete="name" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="identifier">Email or Phone Number</label>
+          <div class="input-wrapper">
+            <span class="material-icons-round input-icon">account_circle</span>
+            <input type="text" id="identifier" name="identifier" placeholder="you@example.com or +1234567890" required autocomplete="username" />
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">
+          <span class="material-icons-round">rocket_launch</span>
+          Continue to Verify
+        </button>
+      </form>
+
+      <p class="auth-switch">
+        Already have an account?
+        <a href="{{ url_for('login') }}">Sign in</a>
+      </p>
+      <a href="{{ url_for('index') }}" class="auth-back">
+        <span class="material-icons-round">arrow_back</span>
+        Back to home
+      </a>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+{% endblock %}

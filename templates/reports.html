@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% block title %}Reports — EcoTrack{% endblock %}
+{% block page_title %}Reports & Export{% endblock %}
+
+{% block content %}
+
+<!-- ── REPORT STATS ───────────────────────────────────────────────── -->
+<div class="stats-grid stats-grid-3">
+  <div class="stat-card stat-card-green">
+    <div class="stat-icon"><span class="material-icons-round">co2</span></div>
+    <div class="stat-body">
+      <div class="stat-value">{{ "%.2f"|format(stats.total or 0) }} kg</div>
+      <div class="stat-label">Total CO₂ Logged</div>
+    </div>
+  </div>
+  <div class="stat-card stat-card-blue">
+    <div class="stat-icon"><span class="material-icons-round">list_alt</span></div>
+    <div class="stat-body">
+      <div class="stat-value">{{ stats.count }}</div>
+      <div class="stat-label">Total Entries</div>
+    </div>
+  </div>
+  <div class="stat-card stat-card-purple">
+    <div class="stat-icon"><span class="material-icons-round">date_range</span></div>
+    <div class="stat-body">
+      <div class="stat-value">{{ stats.first_log or 'N/A' }}</div>
+      <div class="stat-label">Tracking Since</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── DOWNLOAD SECTION ──────────────────────────────────────────── -->
+<div class="card download-card">
+  <div class="card-header">
+    <span class="material-icons-round">file_download</span>
+    Download Report
+  </div>
+
+  <p class="download-desc">
+    Export your emission data as a <strong>CSV spreadsheet</strong> or a
+    styled <strong>PDF report</strong>. You can optionally filter by date range.
+  </p>
+
+  <div class="filter-row" id="filterRow">
+    <div class="form-group">
+      <label for="start_date">Start Date</label>
+      <div class="input-wrapper">
+        <span class="material-icons-round input-icon">event</span>
+        <input type="date" id="start_date" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="end_date">End Date</label>
+      <div class="input-wrapper">
+        <span class="material-icons-round input-icon">event</span>
+        <input type="date" id="end_date" />
+      </div>
+    </div>
+  </div>
+
+  <div class="download-buttons">
+    <button class="btn btn-success btn-lg" id="csvBtn" onclick="downloadReport('csv')">
+      <span class="material-icons-round">table_chart</span>
+      Download CSV
+    </button>
+    <button class="btn btn-outline btn-lg" id="pdfBtn" onclick="downloadReport('pdf')">
+      <span class="material-icons-round">picture_as_pdf</span>
+      Download PDF
+    </button>
+  </div>
+</div>
+
+<!-- ── CATEGORY SUMMARY ──────────────────────────────────────────── -->
+{% if by_category %}
+<div class="card">
+  <div class="card-header">
+    <span class="material-icons-round">summarize</span>
+    Emissions Summary by Category
+  </div>
+  <div class="summary-table-wrap">
+    <table class="summary-table">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Total CO₂ (kg)</th>
+          <th>Share</th>
+          <th>Visual</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% set grand_total = by_category | sum(attribute='total') %}
+        {% for cat in by_category %}
+        <tr>
+          <td>
+            <span class="cat-badge" style="background:{{ cat.color }}22; color:{{ cat.color }}">
+              <span class="material-icons-round" style="font-size:16px">{{ cat.icon }}</span>
+              {{ cat.name }}
+            </span>
+          </td>
+          <td><strong>{{ "%.3f"|format(cat.total) }}</strong></td>
+          <td>
+            {% if grand_total > 0 %}
+              {{ "%.1f"|format((cat.total / grand_total) * 100) }}%
+            {% else %}0%{% endif %}
+          </td>
+          <td style="width:200px">
+            <div class="mini-bar-wrap">
+              <div class="mini-bar" style="
+                width: {% if grand_total > 0 %}{{ ((cat.total / grand_total) * 100)|round }}{% else %}0{% endif %}%;
+                background: {{ cat.color }}">
+              </div>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+        <tr class="total-row">
+          <td><strong>Total</strong></td>
+          <td><strong>{{ "%.3f"|format(grand_total) }}</strong></td>
+          <td><strong>100%</strong></td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="card">
+  <div class="empty-state">
+    <span class="material-icons-round">bar_chart</span>
+    <p>No data yet. <a href="{{ url_for('tracker') }}">Start logging emissions</a> to see your summary.</p>
+  </div>
+</div>
+{% endif %}
+
+<script src="{{ url_for('static', filename='js/report.js') }}"></script>
+{% endblock %}

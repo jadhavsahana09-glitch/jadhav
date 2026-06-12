@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% block title %}Progress — EcoTrack{% endblock %}
+{% block page_title %}Progress & Analytics{% endblock %}
+
+{% block content %}
+
+<!-- ── KPI CARDS ─────────────────────────────────────────────────── -->
+<div class="stats-grid">
+  <div class="stat-card stat-card-green">
+    <div class="stat-icon"><span class="material-icons-round">co2</span></div>
+    <div class="stat-body">
+      <div class="stat-value">{{ month_total }} kg</div>
+      <div class="stat-label">This Month</div>
+    </div>
+  </div>
+  <div class="stat-card stat-card-blue">
+    <div class="stat-icon"><span class="material-icons-round">flag</span></div>
+    <div class="stat-body">
+      <div class="stat-value">{{ monthly_target }} kg</div>
+      <div class="stat-label">Monthly Target</div>
+    </div>
+  </div>
+  <div class="stat-card {% if change_pct > 0 %}stat-card-red{% else %}stat-card-teal{% endif %}">
+    <div class="stat-icon">
+      <span class="material-icons-round">
+        {% if change_pct > 0 %}trending_up{% else %}trending_down{% endif %}
+      </span>
+    </div>
+    <div class="stat-body">
+      <div class="stat-value">
+        {% if change_pct > 0 %}+{% endif %}{{ change_pct }}%
+      </div>
+      <div class="stat-label">vs Last Month</div>
+    </div>
+  </div>
+  <div class="stat-card stat-card-purple">
+    <div class="stat-icon"><span class="material-icons-round">local_fire_department</span></div>
+    <div class="stat-body">
+      <div class="stat-value">{{ streak }}</div>
+      <div class="stat-label">Day Streak 🔥</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── GOAL MANAGEMENT ───────────────────────────────────────────── -->
+<div class="card goal-management-card">
+  <div class="card-header">
+    <span class="material-icons-round">track_changes</span>
+    Goal Progress — {{ goal_pct }}% of {{ monthly_target }} kg used
+  </div>
+  <div class="progress-track" style="margin: 12px 0 8px">
+    <div class="progress-fill {% if goal_pct >= 100 %}fill-danger{% elif goal_pct >= 75 %}fill-warning{% else %}fill-success{% endif %}"
+         style="width: {{ goal_pct }}%"></div>
+  </div>
+  <form method="POST" action="{{ url_for('update_goal') }}" class="goal-form">
+    <div class="input-wrapper" style="max-width:220px">
+      <span class="material-icons-round input-icon">flag</span>
+      <input type="number" name="monthly_target" value="{{ monthly_target }}"
+             min="1" step="0.5" placeholder="e.g. 80" required />
+      <span class="input-suffix">kg/mo</span>
+    </div>
+    <button type="submit" class="btn btn-primary">
+      <span class="material-icons-round">save</span>
+      Update Goal
+    </button>
+  </form>
+</div>
+
+<!-- ── CHARTS ────────────────────────────────────────────────────── -->
+<div class="charts-row">
+  <div class="card chart-card chart-card-wide">
+    <div class="card-header">
+      <span class="material-icons-round">bar_chart</span>
+      6-Month Emission Trend
+    </div>
+    <div class="chart-container">
+      <canvas id="monthlyChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="charts-row">
+  <div class="card chart-card">
+    <div class="card-header">
+      <span class="material-icons-round">donut_large</span>
+      All-Time by Category
+    </div>
+    {% if all_category %}
+    <div class="chart-container">
+      <canvas id="allCatChart"></canvas>
+    </div>
+    {% else %}
+    <div class="empty-chart">
+      <span class="material-icons-round">bubble_chart</span>
+      <p>No data yet.</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="card chart-card">
+    <div class="card-header">
+      <span class="material-icons-round">leaderboard</span>
+      Category Breakdown
+    </div>
+    {% if all_category %}
+    <div class="category-breakdown">
+      {% set max_val = all_category[0].total %}
+      {% for cat in all_category %}
+      <div class="breakdown-row">
+        <div class="breakdown-label">
+          <span class="dot" style="background:{{ cat.color }}"></span>
+          {{ cat.name }}
+        </div>
+        <div class="breakdown-bar-wrap">
+          <div class="breakdown-bar" style="width: {{ ((cat.total / max_val) * 100)|round }}%; background:{{ cat.color }}"></div>
+        </div>
+        <div class="breakdown-value">{{ "%.2f"|format(cat.total) }} kg</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <span class="material-icons-round">bar_chart</span>
+      <p>No data yet.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const monthLabels = {{ month_labels | safe }};
+const monthValues = {{ month_values | safe }};
+const catLabels   = {{ cat_labels | safe }};
+const catValues   = {{ cat_values | safe }};
+const catColors   = {{ cat_colors | safe }};
+
+// Monthly Bar Chart
+if (document.getElementById('monthlyChart')) {
+  new Chart(document.getElementById('monthlyChart'), {
+    type: 'bar',
+    data: {
+      labels: monthLabels,
+      datasets: [{
+        label: 'CO₂ (kg)',
+        data: monthValues,
+        backgroundColor: monthValues.map((v, i) =>
+          i === monthValues.length - 1 ? '#4ade80cc' : '#4ade8055'),
+        borderColor: '#4ade80',
+        borderWidth: 2,
+        borderRadius: 6,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#8b949e' } },
+        y: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#8b949e' }, beginAtZero: true }
+      }
+    }
+  });
+}
+
+// All-time Doughnut
+if (document.getElementById('allCatChart') && catValues.length) {
+  new Chart(document.getElementById('allCatChart'), {
+    type: 'doughnut',
+    data: {
+      labels: catLabels,
+      datasets: [{
+        data: catValues,
+        backgroundColor: catColors.map(c => c + 'cc'),
+        borderColor: catColors,
+        borderWidth: 2,
+        hoverOffset: 10,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '60%',
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#8b949e', padding: 14, font: { size: 12 } } }
+      }
+    }
+  });
+}
+</script>
+{% endblock %}

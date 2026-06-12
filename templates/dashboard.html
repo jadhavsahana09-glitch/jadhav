@@ -1,0 +1,339 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — EcoTrack{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+{% set now = now %}
+
+<!-- ── SUMMARY CARDS ─────────────────────────────────────────────── -->
+<div class="stats-grid">
+  <div class="stat-card stat-card-green">
+    <div class="stat-icon"><span class="material-icons-round">co2</span></div>
+    <div class="stat-body">
+      <div class="stat-value" id="monthTotalCard">{{ month_total }} kg</div>
+      <div class="stat-label">CO₂ This Month</div>
+    </div>
+    <div class="stat-badge">
+      <span class="material-icons-round">calendar_month</span>
+    </div>
+  </div>
+
+  <div class="stat-card stat-card-blue">
+    <div class="stat-icon"><span class="material-icons-round">flag</span></div>
+    <div class="stat-body">
+      <div class="stat-value" id="monthlyTargetCard">{{ monthly_target }} kg</div>
+      <div class="stat-label">Monthly Target</div>
+    </div>
+    <div class="stat-badge">
+      <span class="material-icons-round">track_changes</span>
+    </div>
+  </div>
+
+  <div class="stat-card {% if goal_pct >= 100 %}stat-card-red{% elif goal_pct >= 75 %}stat-card-orange{% else %}stat-card-purple{% endif %}" id="goalPctCardWrapper">
+    <div class="stat-icon"><span class="material-icons-round" id="goalPctIcon">{% if goal_pct >= 100 %}warning{% else %}donut_large{% endif %}</span></div>
+    <div class="stat-body">
+      <div class="stat-value" id="goalPctCard">{{ goal_pct }}%</div>
+      <div class="stat-label">Goal Used</div>
+    </div>
+    <div class="stat-badge">
+      <span class="material-icons-round">check_circle</span>
+    </div>
+  </div>
+
+  <div class="stat-card stat-card-teal">
+    <div class="stat-icon"><span class="material-icons-round">format_list_bulleted</span></div>
+    <div class="stat-body">
+      <div class="stat-value" id="totalEntriesCard">{{ total_entries }}</div>
+      <div class="stat-label">Total Entries</div>
+    </div>
+    <div class="stat-badge">
+      <span class="material-icons-round">history</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── GOAL PROGRESS BAR ─────────────────────────────────────────── -->
+<div class="card goal-bar-card">
+  <div class="card-header">
+    <span class="material-icons-round">track_changes</span>
+    Monthly Goal Progress
+  </div>
+  <div class="goal-progress">
+    <div class="goal-labels" id="goalProgressLabels">
+      <span>{{ month_total }} kg used</span>
+      <span>{{ monthly_target }} kg target</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill {% if goal_pct >= 100 %}fill-danger{% elif goal_pct >= 75 %}fill-warning{% else %}fill-success{% endif %}"
+           id="goalProgressBar" style="width: {{ goal_pct }}%"></div>
+    </div>
+    <div class="goal-hint" id="goalHintText">
+      {% if goal_pct >= 100 %}
+        ⚠️ You've exceeded your monthly target!
+      {% elif goal_pct >= 75 %}
+        📊 You're at {{ goal_pct }}% of your target — be mindful.
+      {% else %}
+        🌱 Great job! You're at {{ goal_pct }}% of your monthly target.
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- ── CHARTS ROW ────────────────────────────────────────────────── -->
+<div class="charts-row">
+  <div class="card chart-card">
+    <div class="card-header">
+      <span class="material-icons-round">show_chart</span>
+      7-Day Emission Trend
+    </div>
+    <div class="chart-container">
+      <canvas id="trendChart"></canvas>
+    </div>
+  </div>
+
+  <div class="card chart-card">
+    <div class="card-header">
+      <span class="material-icons-round">pie_chart</span>
+      By Category (This Month)
+    </div>
+    
+    <div class="chart-container" id="categoryChartContainer" style="display: {% if category_data %}block{% else %}none{% endif %};">
+      <canvas id="categoryChart"></canvas>
+    </div>
+    
+    <div class="empty-chart" id="categoryChartEmpty" style="display: {% if category_data %}none{% else %}flex{% endif %}; flex-direction: column; align-items: center; justify-content: center;">
+      <span class="material-icons-round">bubble_chart</span>
+      <p>No data yet. Start logging emissions!</p>
+      <a href="{{ url_for('tracker') }}" class="btn btn-primary btn-sm">Log Now</a>
+    </div>
+  </div>
+</div>
+
+<!-- ── RECENT ENTRIES ────────────────────────────────────────────── -->
+<div class="card">
+  <div class="card-header">
+    <span class="material-icons-round">history</span>
+    Recent Entries
+    <a href="{{ url_for('tracker') }}" class="card-action">View All</a>
+  </div>
+  <div id="recentEntriesContainer">
+    {% if recent_entries %}
+    <div class="entry-list">
+      {% for entry in recent_entries %}
+      <div class="entry-item">
+        <div class="entry-icon" style="background: {{ entry.category_color }}22; color: {{ entry.category_color }}">
+          <span class="material-icons-round">{{ entry.category_icon }}</span>
+        </div>
+        <div class="entry-body">
+          <div class="entry-title">{{ entry.category_name }}</div>
+          <div class="entry-meta">{{ entry.description or 'No description' }} &bull; {{ entry.log_date }}</div>
+        </div>
+        <div class="entry-amount">{{ "%.2f"|format(entry.amount) }} kg</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <span class="material-icons-round">eco</span>
+      <p>No entries yet. <a href="{{ url_for('tracker') }}">Log your first emission →</a></p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let dayLabels  = {{ day_labels | safe }};
+let dailyData  = {{ daily_chart | safe }};
+let catLabels  = {{ cat_labels | safe }};
+let catValues  = {{ cat_values | safe }};
+let catColors  = {{ cat_colors | safe }};
+
+let trendChartInstance = null;
+let categoryChartInstance = null;
+
+// ── Trend Line Chart Initialization ──────────────────────────────────────────
+if (document.getElementById('trendChart')) {
+  trendChartInstance = new Chart(document.getElementById('trendChart'), {
+    type: 'line',
+    data: {
+      labels: dayLabels,
+      datasets: [{
+        label: 'CO₂ (kg)',
+        data: dailyData,
+        borderColor: '#4ade80',
+        backgroundColor: 'rgba(74,222,128,0.12)',
+        borderWidth: 2.5,
+        pointBackgroundColor: '#4ade80',
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        fill: true,
+        tension: 0.4,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#8b949e' } },
+        y: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#8b949e' },
+             beginAtZero: true }
+      }
+    }
+  });
+}
+
+// ── Category Chart Helper Function ────────────────────────────────────────────
+function drawCategoryChart(labels, values, colors) {
+  const container = document.getElementById('categoryChartContainer');
+  const emptyState = document.getElementById('categoryChartEmpty');
+  
+  if (values && values.length > 0) {
+    container.style.display = 'block';
+    emptyState.style.display = 'none';
+    
+    if (!categoryChartInstance) {
+      categoryChartInstance = new Chart(document.getElementById('categoryChart'), {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: values,
+            backgroundColor: colors.map(c => c + 'cc'),
+            borderColor: colors,
+            borderWidth: 2,
+            hoverOffset: 8,
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          cutout: '62%',
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: '#8b949e', padding: 14, font: { size: 12 } }
+            }
+          }
+        }
+      });
+    } else {
+      categoryChartInstance.data.labels = labels;
+      categoryChartInstance.data.datasets[0].data = values;
+      categoryChartInstance.data.datasets[0].backgroundColor = colors.map(c => c + 'cc');
+      categoryChartInstance.data.datasets[0].borderColor = colors;
+      categoryChartInstance.update();
+    }
+  } else {
+    container.style.display = 'none';
+    emptyState.style.display = 'flex';
+    if (categoryChartInstance) {
+      categoryChartInstance.destroy();
+      categoryChartInstance = null;
+    }
+  }
+}
+
+// Draw initially if data is present
+drawCategoryChart(catLabels, catValues, catColors);
+
+// ── Real-Time AJAX Polling ────────────────────────────────────────────────────
+function fetchDashboardData() {
+  fetch('/api/dashboard-data')
+    .then(res => {
+      if (!res.ok) throw new Error('Network error');
+      return res.json();
+    })
+    .then(data => {
+      // 1. Update metric cards
+      document.getElementById('monthTotalCard').innerText = data.month_total + ' kg';
+      document.getElementById('monthlyTargetCard').innerText = data.monthly_target + ' kg';
+      document.getElementById('goalPctCard').innerText = data.goal_pct + '%';
+      document.getElementById('totalEntriesCard').innerText = data.total_entries;
+
+      // Update goal used status class and icon
+      const wrapper = document.getElementById('goalPctCardWrapper');
+      wrapper.className = 'stat-card';
+      if (data.goal_pct >= 100) {
+        wrapper.classList.add('stat-card-red');
+        document.getElementById('goalPctIcon').innerText = 'warning';
+      } else if (data.goal_pct >= 75) {
+        wrapper.classList.add('stat-card-orange');
+        document.getElementById('goalPctIcon').innerText = 'warning';
+      } else {
+        wrapper.classList.add('stat-card-purple');
+        document.getElementById('goalPctIcon').innerText = 'donut_large';
+      }
+
+      // 2. Update progress bar
+      document.getElementById('goalProgressLabels').innerHTML = `
+        <span>${data.month_total} kg used</span>
+        <span>${data.monthly_target} kg target</span>
+      `;
+      const pBar = document.getElementById('goalProgressBar');
+      pBar.style.width = data.goal_pct + '%';
+      pBar.className = 'progress-fill';
+      if (data.goal_pct >= 100) {
+        pBar.classList.add('fill-danger');
+      } else if (data.goal_pct >= 75) {
+        pBar.classList.add('fill-warning');
+      } else {
+        pBar.classList.add('fill-success');
+      }
+
+      // Update goal hint text
+      const hint = document.getElementById('goalHintText');
+      if (data.goal_pct >= 100) {
+        hint.innerHTML = '⚠️ You\'ve exceeded your monthly target!';
+      } else if (data.goal_pct >= 75) {
+        hint.innerHTML = `📊 You're at ${data.goal_pct}% of your target — be mindful.`;
+      } else {
+        hint.innerHTML = `🌱 Great job! You're at ${data.goal_pct}% of your monthly target.`;
+      }
+
+      // 3. Update trend chart
+      if (trendChartInstance) {
+        trendChartInstance.data.labels = data.day_labels;
+        trendChartInstance.data.datasets[0].data = data.daily_chart;
+        trendChartInstance.update();
+      }
+
+      // 4. Update category doughnut chart
+      drawCategoryChart(data.cat_labels, data.cat_values, data.cat_colors);
+
+      // 5. Update recent entries log list
+      const container = document.getElementById('recentEntriesContainer');
+      if (data.recent_entries.length > 0) {
+        let listHtml = '<div class="entry-list">';
+        data.recent_entries.forEach(entry => {
+          listHtml += `
+            <div class="entry-item">
+              <div class="entry-icon" style="background: ${entry.category_color}22; color: ${entry.category_color}">
+                <span class="material-icons-round">${entry.category_icon}</span>
+              </div>
+              <div class="entry-body">
+                <div class="entry-title">${entry.category_name}</div>
+                <div class="entry-meta">${entry.description || 'No description'} &bull; ${entry.log_date}</div>
+              </div>
+              <div class="entry-amount">${entry.amount.toFixed(2)} kg</div>
+            </div>
+          `;
+        });
+        listHtml += '</div>';
+        container.innerHTML = listHtml;
+      } else {
+        container.innerHTML = `
+          <div class="empty-state">
+            <span class="material-icons-round">eco</span>
+            <p>No entries yet. <a href="/tracker">Log your first emission →</a></p>
+          </div>
+        `;
+      }
+    })
+    .catch(err => console.error('Real-time sync error:', err));
+}
+
+// Fetch dashboard data every 5 seconds (5000ms)
+setInterval(fetchDashboardData, 5000);
+</script>
+{% endblock %}

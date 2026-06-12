@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}EcoTrack — Carbon Footprint Tracker{% endblock %}</title>
+  <meta name="description" content="{% block description %}Track and reduce your carbon footprint with EcoTrack — the premium sustainability dashboard.{% endblock %}" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+
+  <style>
+    .db-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      margin-top: 5px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      width: fit-content;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .db-badge .material-icons-round {
+      font-size: 11px !important;
+    }
+    .db-mysql {
+      background: rgba(96, 165, 250, 0.12);
+      color: var(--accent-blue);
+      border: 1px solid rgba(96, 165, 250, 0.2);
+    }
+    .db-sqlite {
+      background: rgba(251, 146, 60, 0.12);
+      color: var(--accent-orange);
+      border: 1px solid rgba(251, 146, 60, 0.2);
+    }
+  </style>
+
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+{% if current_user.is_authenticated %}
+<!-- ── SIDEBAR ──────────────────────────────────────────────────── -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <span class="material-icons-round logo-icon">eco</span>
+    <span class="logo-text">EcoTrack</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a href="{{ url_for('dashboard') }}" class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+      <span class="material-icons-round">dashboard</span>
+      <span>Dashboard</span>
+    </a>
+    <a href="{{ url_for('tracker') }}" class="nav-item {% if request.endpoint == 'tracker' %}active{% endif %}">
+      <span class="material-icons-round">add_circle</span>
+      <span>Log Emission</span>
+    </a>
+    <a href="{{ url_for('progress') }}" class="nav-item {% if request.endpoint == 'progress' %}active{% endif %}">
+      <span class="material-icons-round">trending_up</span>
+      <span>Progress</span>
+    </a>
+    <a href="{{ url_for('reports') }}" class="nav-item {% if request.endpoint == 'reports' %}active{% endif %}">
+      <span class="material-icons-round">file_download</span>
+      <span>Reports</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <div class="user-avatar">{{ current_user.name[0].upper() }}</div>
+      <div class="user-details">
+        <span class="user-name">{{ current_user.name }}</span>
+        <span class="user-email">{{ current_user.email or current_user.phone }}</span>
+        <span class="db-badge {% if db_mode == 'mysql' %}db-mysql{% else %}db-sqlite{% endif %}" title="Active Database Mode">
+          <span class="material-icons-round">storage</span>
+          {{ 'MySQL' if db_mode == 'mysql' else 'SQLite' }}
+        </span>
+      </div>
+    </div>
+    <a href="{{ url_for('logout') }}" class="logout-btn" title="Logout">
+      <span class="material-icons-round">logout</span>
+    </a>
+  </div>
+</aside>
+
+<!-- ── MAIN CONTENT ─────────────────────────────────────────────── -->
+<div class="main-wrapper">
+  <header class="topbar">
+    <button class="menu-toggle" id="menuToggle" onclick="toggleSidebar()">
+      <span class="material-icons-round">menu</span>
+    </button>
+    <div class="topbar-title">{% block page_title %}{% endblock %}</div>
+    <div class="topbar-actions">
+      <span class="topbar-date">{{ now.strftime('%B %d, %Y') if now else '' }}</span>
+    </div>
+  </header>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container">
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">
+            <span class="material-icons-round flash-icon">
+              {% if category == 'success' %}check_circle{% elif category == 'danger' %}error{% else %}info{% endif %}
+            </span>
+            <span>{{ message }}</span>
+            <button class="flash-close" onclick="this.parentElement.remove()">
+              <span class="material-icons-round">close</span>
+            </button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <main class="page-content">
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
+{% else %}
+<!-- Auth pages – no sidebar -->
+<div class="auth-wrapper">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container auth-flash">
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">
+            <span class="material-icons-round flash-icon">
+              {% if category == 'success' %}check_circle{% elif category == 'danger' %}error{% else %}info{% endif %}
+            </span>
+            <span>{{ message }}</span>
+            <button class="flash-close" onclick="this.parentElement.remove()">
+              <span class="material-icons-round">close</span>
+            </button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+  {{ self.content() }}
+</div>
+{% endif %}
+
+<script>
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('collapsed');
+    document.querySelector('.main-wrapper').classList.toggle('expanded');
+  }
+  // Auto-close flash after 4 s
+  setTimeout(() => {
+    document.querySelectorAll('.flash').forEach(el => {
+      el.style.opacity = '0';
+      setTimeout(() => el.remove(), 400);
+    });
+  }, 4000);
+</script>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

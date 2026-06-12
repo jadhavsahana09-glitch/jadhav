@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% block title %}Verify OTP — EcoTrack{% endblock %}
+
+{% block head %}
+<style>
+  .otp-container {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 24px 0;
+  }
+  .otp-input {
+    width: 48px;
+    height: 56px;
+    font-size: 24px;
+    font-weight: 700;
+    text-align: center;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--glass-border);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: all var(--transition);
+  }
+  .otp-input:focus {
+    border-color: var(--accent-green);
+    box-shadow: 0 0 0 3px rgba(74,222,128,0.12);
+    outline: none;
+  }
+  /* Hide number arrows */
+  .otp-input::-webkit-outer-spin-button,
+  .otp-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+  <!-- Left panel -->
+  <div class="auth-panel auth-panel-left">
+    <div class="auth-brand">
+      <span class="material-icons-round">eco</span>
+      EcoTrack
+    </div>
+    <h1>Verify Your<br /><span class="gradient-text">Identity.</span></h1>
+    <p>We've sent a 6-digit one-time password to your contact method to verify it's you.</p>
+  </div>
+
+  <!-- Right panel -->
+  <div class="auth-panel auth-panel-right">
+    <div class="auth-card">
+      <h2>Enter OTP</h2>
+      <p class="auth-card-subtitle">
+        We sent a code to <strong style="color:var(--text-primary)">{{ identifier }}</strong>
+      </p>
+
+      <form method="POST" action="{{ url_for('verify_otp') }}" id="otpForm">
+        <div class="otp-container">
+          <input type="text" name="otp1" class="otp-input" maxlength="1" required autocomplete="one-time-code" autofocus>
+          <input type="text" name="otp2" class="otp-input" maxlength="1" required>
+          <input type="text" name="otp3" class="otp-input" maxlength="1" required>
+          <input type="text" name="otp4" class="otp-input" maxlength="1" required>
+          <input type="text" name="otp5" class="otp-input" maxlength="1" required>
+          <input type="text" name="otp6" class="otp-input" maxlength="1" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">
+          <span class="material-icons-round">check_circle</span>
+          Verify & Continue
+        </button>
+      </form>
+
+      <form method="POST" action="{{ url_for('resend_otp') }}" style="margin-top: 24px; text-align: center;">
+        <button type="submit" class="btn btn-ghost">
+          <span class="material-icons-round">refresh</span>
+          Resend Code
+        </button>
+      </form>
+
+      <a href="{{ url_for('login') }}" class="auth-back" style="margin-top: 32px;">
+        <span class="material-icons-round">arrow_back</span>
+        Use a different account
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Auto-focus next input in OTP
+  const inputs = document.querySelectorAll('.otp-input');
+  inputs.forEach((input, index) => {
+    input.addEventListener('input', (e) => {
+      // If user types a number and we are not at the last input, focus next
+      if (e.target.value.length === 1 && index < inputs.length - 1) {
+        inputs[index + 1].focus();
+      }
+    });
+
+    input.addEventListener('keydown', (e) => {
+      // Handle backspace
+      if (e.key === 'Backspace' && !e.target.value && index > 0) {
+        inputs[index - 1].focus();
+      }
+    });
+    
+    // Handle paste
+    input.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const pastedData = e.clipboardData.getData('text').trim().slice(0, 6);
+      if (/^\d+$/.test(pastedData)) {
+        for (let i = 0; i < pastedData.length; i++) {
+          if (inputs[i]) {
+            inputs[i].value = pastedData[i];
+            if (i < inputs.length - 1) {
+              inputs[i+1].focus();
+            } else {
+              inputs[i].focus();
+            }
+          }
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}

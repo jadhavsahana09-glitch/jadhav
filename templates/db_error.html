@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Database Connection Required — EcoTrack</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  
+  <!-- App CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  
+  <style>
+    .error-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: var(--bg-primary);
+      padding: 20px;
+    }
+    .error-card {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      max-width: 550px;
+      width: 100%;
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+    }
+    .error-icon {
+      font-size: 64px !important;
+      color: var(--warning);
+      margin-bottom: 20px;
+      filter: drop-shadow(0 0 12px rgba(251,146,60,0.3));
+    }
+    .error-card h1 {
+      font-size: 26px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+    .error-card p {
+      color: var(--text-secondary);
+      font-size: 15px;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    .error-details {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      text-align: left;
+      font-family: monospace;
+      font-size: 13px;
+      color: var(--danger);
+      margin-bottom: 24px;
+      word-break: break-all;
+      white-space: pre-wrap;
+    }
+    .instruction-list {
+      text-align: left;
+      margin-bottom: 28px;
+      list-style-type: none;
+      padding-left: 0;
+    }
+    .instruction-list li {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .instruction-list li .step-num {
+      background: rgba(74,222,128,0.15);
+      color: var(--accent-green);
+      font-weight: 700;
+      font-size: 11px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="error-wrapper">
+    <div class="error-card">
+      <span class="material-icons-round error-icon">dns</span>
+      <h1>Database Connection Failed</h1>
+      <p>EcoTrack could not connect to your MySQL database. Please check the setup instructions below:</p>
+      
+      <ul class="instruction-list">
+        <li>
+          <span class="step-num">1</span>
+          <span>Ensure your <strong>MySQL Server</strong> is running (usually on port 3306).</span>
+        </li>
+        <li>
+          <span class="step-num">2</span>
+          <span>Make sure you have created the database tables by executing <code>schema.sql</code>. (The app will attempt to run this automatically once connected).</span>
+        </li>
+        <li>
+          <span class="step-num">3</span>
+          <span>Verify your host, user, and password in <strong><code>config.py</code></strong>.</span>
+        </li>
+      </ul>
+
+      {% if error %}
+      <div class="error-details">{{ error }}</div>
+      {% endif %}
+
+      <div class="btn-row">
+        <a href="" class="btn btn-primary">
+          <span class="material-icons-round">refresh</span>
+          Retry Connection
+        </a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

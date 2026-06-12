@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% block title %}Log Emissions — EcoTrack{% endblock %}
+{% block page_title %}Log Emissions{% endblock %}
+
+{% block content %}
+<div class="tracker-layout">
+  <!-- ── LOG FORM ──────────────────────────────────────────────────── -->
+  <div class="card log-form-card">
+    <div class="card-header">
+      <span class="material-icons-round">add_circle</span>
+      Add New Emission Entry
+    </div>
+
+    <form method="POST" action="{{ url_for('tracker') }}" id="trackerForm">
+      <!-- Category Pills -->
+      <div class="form-group">
+        <label>Category</label>
+        <div class="category-pills" id="categoryPills">
+          {% for cat in categories %}
+          <label class="pill-label" for="cat_{{ cat.id }}">
+            <input type="radio" id="cat_{{ cat.id }}" name="category_id"
+                   value="{{ cat.id }}" {% if loop.first %}checked{% endif %} />
+            <span class="pill" style="--pill-color: {{ cat.color }}">
+              <span class="material-icons-round">{{ cat.icon }}</span>
+              {{ cat.name }}
+            </span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Amount -->
+      <div class="form-group">
+        <label for="amount">CO₂ Amount <small>(kg)</small></label>
+        <div class="input-wrapper">
+          <span class="material-icons-round input-icon">scale</span>
+          <input type="number" id="amount" name="amount" step="0.001" min="0.001"
+                 placeholder="e.g. 2.5" required />
+          <span class="input-suffix">kg CO₂</span>
+        </div>
+      </div>
+
+      <!-- Date -->
+      <div class="form-group">
+        <label for="log_date">Date</label>
+        <div class="input-wrapper">
+          <span class="material-icons-round input-icon">event</span>
+          <input type="date" id="log_date" name="log_date" value="{{ today }}" max="{{ today }}" required />
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label for="description">Notes <small>(optional)</small></label>
+        <textarea id="description" name="description" rows="3"
+                  placeholder="e.g. 'Drove 30 km to work' or 'Long-haul flight'"></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">
+        <span class="material-icons-round">add</span>
+        Log Emission
+      </button>
+    </form>
+
+    <!-- Emission reference guide -->
+    <div class="reference-guide">
+      <div class="reference-title">
+        <span class="material-icons-round">lightbulb</span>
+        Quick Reference (average values)
+      </div>
+      <div class="reference-grid">
+        <div class="ref-item"><span>🚗 Car (1 km)</span><strong>~0.21 kg</strong></div>
+        <div class="ref-item"><span>✈️ Flight (1 km)</span><strong>~0.25 kg</strong></div>
+        <div class="ref-item"><span>🍔 Beef meal</span><strong>~6.61 kg</strong></div>
+        <div class="ref-item"><span>💡 1 kWh electricity</span><strong>~0.23 kg</strong></div>
+        <div class="ref-item"><span>👕 New clothing item</span><strong>~3.0 kg</strong></div>
+        <div class="ref-item"><span>🚌 Bus (1 km)</span><strong>~0.09 kg</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── LOG HISTORY ───────────────────────────────────────────────── -->
+  <div class="card log-history-card">
+    <div class="card-header">
+      <span class="material-icons-round">history</span>
+      Recent Logs
+      <span class="badge">{{ logs|length }}</span>
+    </div>
+
+    {% if logs %}
+    <div class="log-list">
+      {% for log in logs %}
+      <div class="log-row" id="log-{{ log.id }}">
+        <div class="log-icon" style="background:{{ log.category_color }}22; color:{{ log.category_color }}">
+          <span class="material-icons-round">{{ log.category_icon }}</span>
+        </div>
+        <div class="log-body">
+          <div class="log-cat">{{ log.category_name }}</div>
+          <div class="log-note">{{ log.description or '—' }}</div>
+          <div class="log-date">{{ log.log_date }}</div>
+        </div>
+        <div class="log-right">
+          <div class="log-amount">{{ "%.3f"|format(log.amount) }} kg</div>
+          <form method="POST" action="{{ url_for('delete_log', log_id=log.id) }}"
+                onsubmit="return confirm('Delete this entry?')">
+            <button type="submit" class="btn-icon btn-icon-danger" title="Delete">
+              <span class="material-icons-round">delete</span>
+            </button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <span class="material-icons-round">inbox</span>
+      <p>No entries yet. Log your first emission above!</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/tracker.js') }}"></script>
+{% endblock %}

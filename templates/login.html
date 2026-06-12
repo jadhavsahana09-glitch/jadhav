@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Login — EcoTrack{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+  <!-- Left panel -->
+  <div class="auth-panel auth-panel-left">
+    <div class="auth-brand">
+      <span class="material-icons-round">eco</span>
+      EcoTrack
+    </div>
+    <h1>Welcome back,<br /><span class="gradient-text">eco warrior.</span></h1>
+    <p>Sign in to view your dashboard, log emissions, and track your progress.</p>
+    <div class="auth-stats">
+      <div class="auth-stat">
+        <div class="auth-stat-value">5</div>
+        <div class="auth-stat-label">Categories</div>
+      </div>
+      <div class="auth-stat">
+        <div class="auth-stat-value">CSV</div>
+        <div class="auth-stat-label">+ PDF Reports</div>
+      </div>
+      <div class="auth-stat">
+        <div class="auth-stat-value">∞</div>
+        <div class="auth-stat-label">Log Entries</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right panel -->
+  <div class="auth-panel auth-panel-right">
+    <div class="auth-card">
+      <h2>Sign In</h2>
+      <p class="auth-card-subtitle">Enter your email or phone number to receive an OTP.</p>
+
+      <form method="POST" action="{{ url_for('login') }}" id="loginForm" novalidate>
+        <div class="form-group">
+          <label for="identifier">Email or Phone Number</label>
+          <div class="input-wrapper">
+            <span class="material-icons-round input-icon">account_circle</span>
+            <input type="text" id="identifier" name="identifier" placeholder="you@example.com or +1234567890" required autocomplete="username" />
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">
+          <span class="material-icons-round">send</span>
+          Send OTP
+        </button>
+      </form>
+
+      <p class="auth-switch">
+        Don't have an account?
+        <a href="{{ url_for('register') }}">Create one free</a>
+      </p>
+      <a href="{{ url_for('index') }}" class="auth-back">
+        <span class="material-icons-round">arrow_back</span>
+        Back to home
+      </a>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+{% endblock %}

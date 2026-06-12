@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoTrack — Track Your Carbon Footprint</title>
+  <meta name="description" content="EcoTrack helps you monitor, reduce, and report your carbon emissions with a beautiful real-time dashboard." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body class="landing-body">
+
+<!-- ── NAVBAR ─────────────────────────────────────────────────────── -->
+<nav class="landing-nav">
+  <div class="nav-brand">
+    <span class="material-icons-round">eco</span>
+    EcoTrack
+  </div>
+  <div class="nav-links">
+    <a href="{{ url_for('login') }}" class="btn btn-ghost">Log In</a>
+    <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started</a>
+  </div>
+</nav>
+
+<!-- ── HERO ───────────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="material-icons-round">eco</span>
+      Sustainability Platform
+    </div>
+    <h1 class="hero-title">
+      Measure. Reduce.<br />
+      <span class="gradient-text">Save the Planet.</span>
+    </h1>
+    <p class="hero-subtitle">
+      EcoTrack empowers you to monitor your carbon footprint in real time,
+      set reduction goals, and download detailed sustainability reports.
+    </p>
+    <div class="hero-cta">
+      <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+        <span class="material-icons-round">rocket_launch</span>
+        Start Tracking Free
+      </a>
+      <a href="{{ url_for('login') }}" class="btn btn-outline btn-lg">
+        Sign In
+      </a>
+    </div>
+  </div>
+
+  <!-- Floating stat cards -->
+  <div class="hero-cards">
+    <div class="hero-card card-1">
+      <span class="material-icons-round" style="color:#4ade80">directions_car</span>
+      <div>
+        <div class="hc-value">2.4 kg</div>
+        <div class="hc-label">Transport today</div>
+      </div>
+    </div>
+    <div class="hero-card card-2">
+      <span class="material-icons-round" style="color:#facc15">bolt</span>
+      <div>
+        <div class="hc-value">18.7 kg</div>
+        <div class="hc-label">Energy this week</div>
+      </div>
+    </div>
+    <div class="hero-card card-3">
+      <span class="material-icons-round" style="color:#34d399">trending_down</span>
+      <div>
+        <div class="hc-value">–23%</div>
+        <div class="hc-label">vs last month</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FEATURES ───────────────────────────────────────────────────── -->
+<section class="features">
+  <h2 class="section-title">Everything you need to go green</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon" style="--icon-color:#4ade80">
+        <span class="material-icons-round">dashboard</span>
+      </div>
+      <h3>Live Dashboard</h3>
+      <p>Interactive charts and real-time analytics give you a full picture of your emissions at a glance.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="--icon-color:#60a5fa">
+        <span class="material-icons-round">add_circle</span>
+      </div>
+      <h3>Easy Logging</h3>
+      <p>Log emissions across 5 categories — Transport, Energy, Food, Shopping, and Waste — in seconds.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="--icon-color:#f472b6">
+        <span class="material-icons-round">trending_up</span>
+      </div>
+      <h3>Progress Tracking</h3>
+      <p>Monitor your monthly trends, streak, and compare against your personal reduction goals.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="--icon-color:#a78bfa">
+        <span class="material-icons-round">file_download</span>
+      </div>
+      <h3>Reports Download</h3>
+      <p>Export your data as CSV or styled PDF reports, perfect for sharing or personal records.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ─────────────────────────────────────────────────────── -->
+<footer class="landing-footer">
+  <div class="footer-brand">
+    <span class="material-icons-round">eco</span>
+    EcoTrack
+  </div>
+  <p>© 2024 EcoTrack. Building a sustainable future, one log at a time.</p>
+</footer>
+
+</body>
+</html>
