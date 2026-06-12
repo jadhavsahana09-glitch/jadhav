@@ -4,6 +4,9 @@ class Config:
     # Flask
     SECRET_KEY = os.environ.get('SECRET_KEY', 'ecotrack-otp-secret-2024')
 
+    # Vercel Postgres
+    POSTGRES_URL   = os.environ.get('POSTGRES_URL')
+
     # MySQL — change these to match YOUR MySQL setup
     MYSQL_HOST     = os.environ.get('MYSQL_HOST',     'localhost')
     MYSQL_USER     = os.environ.get('MYSQL_USER',     'root')

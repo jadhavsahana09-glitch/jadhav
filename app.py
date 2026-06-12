@@ -54,39 +54,48 @@ def sqlite_row_factory(cursor, row):
         d[col[0]] = row[idx]
     return d
 
-def translate_query(query: str, is_sqlite: bool) -> str:
-    if not is_sqlite:
+def translate_query(query: str, db_mode: str) -> str:
+    if db_mode == 'mysql':
         return query
     
-    # 1. Parameter placeholder translation
-    translated = query.replace('%s', '?')
-    
-    # 2. Date/time function translations
-    translated = translated.replace('NOW()', "datetime('now', 'localtime')")
-    translated = translated.replace("DATE_SUB(CURDATE(), INTERVAL 6 DAY)", "date('now', 'localtime', '-6 days')")
-    translated = translated.replace("DATE_SUB(CURDATE(), INTERVAL 6 MONTH)", "date('now', 'localtime', '-6 months')")
-    translated = translated.replace('CURDATE()', "date('now', 'localtime')")
-    
-    # 3. DATE_FORMAT translation
-    translated = translated.replace("DATE_FORMAT(log_date, '%%Y-%%m')", "strftime('%Y-%m', log_date)")
-    translated = translated.replace("DATE_FORMAT(log_date, '%Y-%m')", "strftime('%Y-%m', log_date)")
-    
-    # 4. Upsert (On Duplicate Key Update) translation
-    if "ON DUPLICATE KEY UPDATE" in query:
-        translated = translated.replace(
-            "ON DUPLICATE KEY UPDATE monthly_target = VALUES(monthly_target)",
-            "ON CONFLICT(user_id) DO UPDATE SET monthly_target = excluded.monthly_target"
-        )
-        
-    return translated
+    if db_mode == 'postgres':
+        translated = query
+        translated = translated.replace('NOW()', "CURRENT_TIMESTAMP")
+        translated = translated.replace("DATE_SUB(CURDATE(), INTERVAL 6 DAY)", "CURRENT_DATE - INTERVAL '6 days'")
+        translated = translated.replace("DATE_SUB(CURDATE(), INTERVAL 6 MONTH)", "CURRENT_DATE - INTERVAL '6 months'")
+        translated = translated.replace('CURDATE()', "CURRENT_DATE")
+        translated = translated.replace("DATE_FORMAT(log_date, '%%Y-%%m')", "TO_CHAR(log_date, 'YYYY-MM')")
+        translated = translated.replace("DATE_FORMAT(log_date, '%Y-%m')", "TO_CHAR(log_date, 'YYYY-MM')")
+        if "ON DUPLICATE KEY UPDATE" in query:
+            translated = translated.replace(
+                "ON DUPLICATE KEY UPDATE monthly_target = VALUES(monthly_target)",
+                "ON CONFLICT(user_id) DO UPDATE SET monthly_target = EXCLUDED.monthly_target"
+            )
+        return translated
+
+    if db_mode == 'sqlite':
+        translated = query.replace('%s', '?')
+        translated = translated.replace('NOW()', "datetime('now', 'localtime')")
+        translated = translated.replace("DATE_SUB(CURDATE(), INTERVAL 6 DAY)", "date('now', 'localtime', '-6 days')")
+        translated = translated.replace("DATE_SUB(CURDATE(), INTERVAL 6 MONTH)", "date('now', 'localtime', '-6 months')")
+        translated = translated.replace('CURDATE()', "date('now', 'localtime')")
+        translated = translated.replace("DATE_FORMAT(log_date, '%%Y-%%m')", "strftime('%Y-%m', log_date)")
+        translated = translated.replace("DATE_FORMAT(log_date, '%Y-%m')", "strftime('%Y-%m', log_date)")
+        if "ON DUPLICATE KEY UPDATE" in query:
+            translated = translated.replace(
+                "ON DUPLICATE KEY UPDATE monthly_target = VALUES(monthly_target)",
+                "ON CONFLICT(user_id) DO UPDATE SET monthly_target = excluded.monthly_target"
+            )
+        return translated
+    return query
 
 class QueryTranslatingCursor:
-    def __init__(self, cursor, is_sqlite):
+    def __init__(self, cursor, db_mode):
         self._cursor = cursor
-        self._is_sqlite = is_sqlite
+        self._db_mode = db_mode
 
     def execute(self, query, params=None):
-        translated = translate_query(query, self._is_sqlite)
+        translated = translate_query(query, self._db_mode)
         if params is not None:
             self._cursor.execute(translated, params)
         else:
@@ -104,7 +113,9 @@ class QueryTranslatingCursor:
 
     @property
     def lastrowid(self):
-        return self._cursor.lastrowid
+        if hasattr(self._cursor, 'lastrowid'):
+            return self._cursor.lastrowid
+        return None
 
     @property
     def rowcount(self):
@@ -114,17 +125,24 @@ class QueryTranslatingCursor:
         return getattr(self._cursor, name)
 
 class QueryTranslatingConnection:
-    def __init__(self, conn, is_sqlite):
+    def __init__(self, conn, db_mode):
         self._conn = conn
-        self._is_sqlite = is_sqlite
+        self._db_mode = db_mode
 
     def cursor(self, dictionary=False):
-        if self._is_sqlite:
+        if self._db_mode == 'sqlite':
             cur = self._conn.cursor()
-            return QueryTranslatingCursor(cur, is_sqlite=True)
+            return QueryTranslatingCursor(cur, 'sqlite')
+        elif self._db_mode == 'postgres':
+            import psycopg2.extras
+            if dictionary:
+                cur = self._conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            else:
+                cur = self._conn.cursor()
+            return QueryTranslatingCursor(cur, 'postgres')
         else:
             cur = self._conn.cursor(dictionary=dictionary)
-            return QueryTranslatingCursor(cur, is_sqlite=False)
+            return QueryTranslatingCursor(cur, 'mysql')
 
     def commit(self):
         self._conn.commit()
@@ -208,6 +226,33 @@ def verify_and_init_db():
     global _db_initialized, DB_MODE
     if _db_initialized:
         return
+        
+    postgres_url = app.config.get('POSTGRES_URL')
+    if postgres_url:
+        try:
+            import psycopg2
+            conn = psycopg2.connect(postgres_url)
+            cur = conn.cursor()
+            
+            cur.execute("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'users')")
+            exists = cur.fetchone()[0]
+            if not exists:
+                import os
+                schema_path = os.path.join(os.path.dirname(__file__), 'schema_pg.sql')
+                if os.path.exists(schema_path):
+                    with open(schema_path, 'r', encoding='utf-8') as f:
+                        schema_sql = f.read()
+                    cur.execute(schema_sql)
+                    conn.commit()
+                    app.logger.info("Database schema initialized successfully from schema_pg.sql")
+            cur.close()
+            conn.close()
+            DB_MODE = 'postgres'
+            _db_initialized = True
+            app.logger.info("Database initialized successfully in PostgreSQL mode.")
+            return
+        except Exception as e:
+            app.logger.warning(f"PostgreSQL connection failed: {e}. Falling back to MySQL.")
     
     try:
         # Connect to MySQL server (without DB name)
@@ -257,20 +302,28 @@ def before_request():
 
 @app.errorhandler(mysql.connector.Error)
 def handle_db_error(e):
-    if DB_MODE == 'sqlite':
+    if DB_MODE == 'sqlite' or DB_MODE == 'postgres':
         return redirect(url_for('index'))
     return render_template('db_error.html', error=str(e)), 500
 
 @app.errorhandler(sqlite3.Error)
 def handle_sqlite_error(e):
+    if DB_MODE != 'sqlite':
+        return redirect(url_for('index'))
     return render_template('db_error.html', error=str(e)), 500
 
 def get_db():
-    if DB_MODE == 'sqlite':
+    if DB_MODE == 'postgres':
+        import psycopg2
+        return QueryTranslatingConnection(
+            psycopg2.connect(app.config['POSTGRES_URL']),
+            db_mode='postgres'
+        )
+    elif DB_MODE == 'sqlite':
         conn = sqlite3.connect('carbon_db.sqlite')
         conn.row_factory = sqlite_row_factory
         conn.execute("PRAGMA foreign_keys = ON")
-        return QueryTranslatingConnection(conn, is_sqlite=True)
+        return QueryTranslatingConnection(conn, db_mode='sqlite')
     else:
         return QueryTranslatingConnection(
             mysql.connector.connect(
@@ -279,7 +332,7 @@ def get_db():
                 password=app.config['MYSQL_PASSWORD'],
                 database=app.config['MYSQL_DB'],
             ),
-            is_sqlite=False
+            db_mode='mysql'
         )
 
 
@@ -567,17 +620,30 @@ def verify_otp():
 
             if purpose == 'register':
                 name = session.pop('register_name', 'User')
-                if is_email(identifier):
-                    cur.execute(
-                        "INSERT INTO users (name, email) VALUES (%s, %s)",
-                        (name, identifier)
-                    )
+                if DB_MODE == 'postgres':
+                    if is_email(identifier):
+                        cur.execute(
+                            "INSERT INTO users (name, email) VALUES (%s, %s) RETURNING id",
+                            (name, identifier)
+                        )
+                    else:
+                        cur.execute(
+                            "INSERT INTO users (name, phone) VALUES (%s, %s) RETURNING id",
+                            (name, identifier)
+                        )
+                    uid = cur.fetchone()['id']
                 else:
-                    cur.execute(
-                        "INSERT INTO users (name, phone) VALUES (%s, %s)",
-                        (name, identifier)
-                    )
-                uid = cur.lastrowid
+                    if is_email(identifier):
+                        cur.execute(
+                            "INSERT INTO users (name, email) VALUES (%s, %s)",
+                            (name, identifier)
+                        )
+                    else:
+                        cur.execute(
+                            "INSERT INTO users (name, phone) VALUES (%s, %s)",
+                            (name, identifier)
+                        )
+                    uid = cur.lastrowid
                 cur.execute(
                     "INSERT INTO goals (user_id, monthly_target) VALUES (%s, 100.000)",
                     (uid,)
