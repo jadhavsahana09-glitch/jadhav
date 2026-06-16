@@ -1,8 +1,8 @@
-﻿import urllib.request
-import urllib.parse
+import re
 import sqlite3
 import sys
-import os
+import urllib.parse
+import urllib.request
 
 BASE_URL = 'http://127.0.0.1:5000'
 
@@ -10,6 +10,7 @@ BASE_URL = 'http://127.0.0.1:5000'
 cookie_processor = urllib.request.HTTPCookieProcessor()
 opener = urllib.request.build_opener(cookie_processor)
 urllib.request.install_opener(opener)
+
 
 def get_otp_from_db(identifier):
     conn = sqlite3.connect('carbon_db.sqlite')
@@ -19,6 +20,12 @@ def get_otp_from_db(identifier):
     cur.close()
     conn.close()
     return row[0] if row else None
+
+
+def extract_csrf(html):
+    match = re.search(r'name="csrf_token" value="([^"]+)"', html)
+    return match.group(1) if match else None
+
 
 try:
     print("0. Cleaning SQLite database tables...")
@@ -36,13 +43,18 @@ try:
     print("1. Accessing Landing Page...")
     html = opener.open(BASE_URL).read().decode('utf-8')
     assert "Carby Control" in html, "Carby Control landing page not loaded"
+    assert "calculator-demo" in html, "Landing calculator section missing"
+    assert "impact-dashboard" in html, "Landing analytics section missing"
     print("   [PASSED]")
 
     print("2. Submitting Registration for Alice...")
     register_url = f"{BASE_URL}/register"
+    register_html = opener.open(register_url).read().decode('utf-8')
+    csrf = extract_csrf(register_html)
     data = urllib.parse.urlencode({
         'name': 'Alice Test',
-        'identifier': 'alice@test.com'
+        'identifier': 'alice@test.com',
+        'csrf_token': csrf
     }).encode('utf-8')
     req = urllib.request.Request(register_url, data=data)
     response = opener.open(req)
@@ -57,10 +69,13 @@ try:
 
     print("4. Verifying OTP...")
     verify_url = f"{BASE_URL}/verify-otp"
+    verify_html = opener.open(verify_url).read().decode('utf-8')
+    csrf = extract_csrf(verify_html)
     form_data = {}
     for i, char in enumerate(otp, 1):
         form_data[f'otp{i}'] = char
-    
+    form_data['csrf_token'] = csrf
+
     data = urllib.parse.urlencode(form_data).encode('utf-8')
     req = urllib.request.Request(verify_url, data=data)
     response = opener.open(req)
@@ -74,11 +89,14 @@ try:
 
     print("6. Logging an Emission Entry (Transport: 15.5 kg CO2)...")
     tracker_url = f"{BASE_URL}/tracker"
+    tracker_html = opener.open(tracker_url).read().decode('utf-8')
+    csrf = extract_csrf(tracker_html)
     data = urllib.parse.urlencode({
-        'category_id': '1', # Transport
+        'category_id': '1',  # Transport
         'amount': '15.5',
         'description': 'Commute to office',
-        'log_date': '2026-06-11'
+        'log_date': '2026-06-11',
+        'csrf_token': csrf
     }).encode('utf-8')
     req = urllib.request.Request(tracker_url, data=data)
     response = opener.open(req)

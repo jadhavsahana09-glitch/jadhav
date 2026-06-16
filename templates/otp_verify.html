@@ -56,13 +56,14 @@
       </p>
 
       <form method="POST" action="{{ url_for('verify_otp') }}" id="otpForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <div class="otp-container">
-          <input type="text" name="otp1" class="otp-input" maxlength="1" required autocomplete="one-time-code" autofocus>
-          <input type="text" name="otp2" class="otp-input" maxlength="1" required>
-          <input type="text" name="otp3" class="otp-input" maxlength="1" required>
-          <input type="text" name="otp4" class="otp-input" maxlength="1" required>
-          <input type="text" name="otp5" class="otp-input" maxlength="1" required>
-          <input type="text" name="otp6" class="otp-input" maxlength="1" required>
+          <input type="text" name="otp1" class="otp-input" maxlength="1" required autocomplete="one-time-code" inputmode="numeric" pattern="[0-9]*" aria-label="OTP digit 1" autofocus>
+          <input type="text" name="otp2" class="otp-input" maxlength="1" required inputmode="numeric" pattern="[0-9]*" aria-label="OTP digit 2">
+          <input type="text" name="otp3" class="otp-input" maxlength="1" required inputmode="numeric" pattern="[0-9]*" aria-label="OTP digit 3">
+          <input type="text" name="otp4" class="otp-input" maxlength="1" required inputmode="numeric" pattern="[0-9]*" aria-label="OTP digit 4">
+          <input type="text" name="otp5" class="otp-input" maxlength="1" required inputmode="numeric" pattern="[0-9]*" aria-label="OTP digit 5">
+          <input type="text" name="otp6" class="otp-input" maxlength="1" required inputmode="numeric" pattern="[0-9]*" aria-label="OTP digit 6">
         </div>
 
         <button type="submit" class="btn btn-primary btn-block">
@@ -72,6 +73,7 @@
       </form>
 
       <form method="POST" action="{{ url_for('resend_otp') }}" style="margin-top: 24px; text-align: center;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <button type="submit" class="btn btn-ghost">
           <span class="material-icons-round">refresh</span>
           Resend Code

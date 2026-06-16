@@ -8,6 +8,7 @@ import io
 import json
 import random
 import smtplib
+import secrets
 from datetime import date, datetime, timedelta
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -40,8 +41,33 @@ login_manager.login_message_category = 'warning'
 def inject_now():
     return {
         'now': datetime.now(),
-        'db_mode': DB_MODE
+        'db_mode': DB_MODE,
+        'csrf_token': generate_csrf_token
     }
+
+
+def generate_csrf_token():
+    token = session.get('csrf_token')
+    if not token:
+        token = secrets.token_urlsafe(32)
+        session['csrf_token'] = token
+    return token
+
+
+def validate_csrf_token():
+    form_token = request.form.get('csrf_token', '')
+    session_token = session.get('csrf_token', '')
+    return bool(form_token) and form_token == session_token
+
+
+@app.before_request
+def enforce_csrf():
+    if request.method == 'POST' and request.endpoint not in {'static'}:
+        if request.endpoint in {'reports_download_csv', 'reports_download_pdf'}:
+            return
+        if not validate_csrf_token():
+            flash('Your session token expired. Please refresh and try again.', 'warning')
+            return redirect(request.referrer or url_for('index'))
 
 
 # ─── DB Helper & SQLite Fallback ──────────────────────────────────────────────
@@ -543,7 +569,7 @@ def register():
         session['register_name']  = name
 
         if demo_code:
-            flash(f'🔐 DEMO — Your OTP is: <strong>{demo_code}</strong>', 'otp')
+            flash(f'DEMO OTP: {demo_code}', 'otp')
         else:
             flash(f'OTP sent to {identifier}. Check your inbox!', 'success')
 
@@ -585,7 +611,7 @@ def login():
         session['otp_purpose']    = 'login'
 
         if demo_code:
-            flash(f'🔐 DEMO — Your OTP is: <strong>{demo_code}</strong>', 'otp')
+            flash(f'DEMO OTP: {demo_code}', 'otp')
         else:
             flash(f'OTP sent to {identifier}. Check your inbox!', 'success')
 
@@ -692,7 +718,7 @@ def resend_otp():
     sent, demo_code = dispatch_otp(identifier, otp)
 
     if demo_code:
-        flash(f'🔐 DEMO — New OTP is: <strong>{demo_code}</strong>', 'otp')
+        flash(f'DEMO OTP: {demo_code}', 'otp')
     else:
         flash(f'New OTP sent to {identifier}!', 'success')
 
@@ -700,7 +726,7 @@ def resend_otp():
 
 
 # ─── Logout ───────────────────────────────────────────────────────────────────
-@app.route('/logout')
+@app.route('/logout', methods=['POST'])
 @login_required
 def logout():
     logout_user()

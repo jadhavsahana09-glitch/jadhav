@@ -18,7 +18,11 @@ function downloadReport(type) {
   if (btn) {
     const originalHTML = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = '<span class="material-icons-round">hourglass_empty</span> Preparing…';
+    btn.replaceChildren();
+    const icon = document.createElement('span');
+    icon.className = 'material-icons-round';
+    icon.textContent = 'hourglass_empty';
+    btn.append(icon, document.createTextNode(' Preparing…'));
     setTimeout(() => {
       btn.disabled = false;
       btn.innerHTML = originalHTML;

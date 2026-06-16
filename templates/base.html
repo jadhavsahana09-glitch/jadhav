@@ -91,16 +91,19 @@
         </span>
       </div>
     </div>
-    <a href="{{ url_for('logout') }}" class="logout-btn" title="Logout">
-      <span class="material-icons-round">logout</span>
-    </a>
+    <form method="POST" action="{{ url_for('logout') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <button type="submit" class="logout-btn" title="Logout" aria-label="Logout">
+        <span class="material-icons-round">logout</span>
+      </button>
+    </form>
   </div>
 </aside>
 
 <!-- ── MAIN CONTENT ─────────────────────────────────────────────── -->
 <div class="main-wrapper">
   <header class="topbar">
-    <button class="menu-toggle" id="menuToggle" onclick="toggleSidebar()">
+    <button class="menu-toggle" id="menuToggle" onclick="toggleSidebar()" aria-label="Toggle navigation">
       <span class="material-icons-round">menu</span>
     </button>
     <div class="topbar-title">{% block page_title %}{% endblock %}</div>
@@ -114,12 +117,12 @@
     {% if messages %}
       <div class="flash-container">
         {% for category, message in messages %}
-          <div class="flash flash-{{ category }}">
+          <div class="flash flash-{{ category }}" role="status" aria-live="polite">
             <span class="material-icons-round flash-icon">
               {% if category == 'success' %}check_circle{% elif category == 'danger' %}error{% else %}info{% endif %}
             </span>
             <span>{{ message }}</span>
-            <button class="flash-close" onclick="this.parentElement.remove()">
+            <button type="button" class="flash-close" onclick="this.parentElement.remove()" aria-label="Dismiss notification">
               <span class="material-icons-round">close</span>
             </button>
           </div>
@@ -140,12 +143,12 @@
     {% if messages %}
       <div class="flash-container auth-flash">
         {% for category, message in messages %}
-          <div class="flash flash-{{ category }}">
+          <div class="flash flash-{{ category }}" role="status" aria-live="polite">
             <span class="material-icons-round flash-icon">
               {% if category == 'success' %}check_circle{% elif category == 'danger' %}error{% else %}info{% endif %}
             </span>
             <span>{{ message }}</span>
-            <button class="flash-close" onclick="this.parentElement.remove()">
+            <button type="button" class="flash-close" onclick="this.parentElement.remove()" aria-label="Dismiss notification">
               <span class="material-icons-round">close</span>
             </button>
           </div>

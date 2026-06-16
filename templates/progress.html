@@ -63,6 +63,7 @@
          style="width: {{ goal_pct }}%"></div>
   </div>
   <form method="POST" action="{{ url_for('update_goal') }}" class="goal-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
     <div class="input-wrapper" style="max-width:220px">
       <span class="material-icons-round input-icon">flag</span>
       <input type="number" name="monthly_target" value="{{ monthly_target }}"

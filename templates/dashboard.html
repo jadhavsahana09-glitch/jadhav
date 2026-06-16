@@ -358,6 +358,85 @@ function drawCategoryChart(labels, values, colors) {
   }
 }
 
+function setGoalProgressLabels(monthTotal, monthlyTarget) {
+  const labels = document.getElementById('goalProgressLabels');
+  if (!labels) return;
+  labels.replaceChildren(
+    Object.assign(document.createElement('span'), { textContent: `${monthTotal} kg used` }),
+    Object.assign(document.createElement('span'), { textContent: `${monthlyTarget} kg target` })
+  );
+}
+
+function setGoalHint(goalPct) {
+  const hint = document.getElementById('goalHintText');
+  if (!hint) return;
+  if (goalPct >= 100) {
+    hint.textContent = "You've exceeded your monthly target!";
+  } else if (goalPct >= 75) {
+    hint.textContent = `You're at ${goalPct}% of your target. Be mindful.`;
+  } else {
+    hint.textContent = `Great job! You're at ${goalPct}% of your monthly target.`;
+  }
+}
+
+function renderRecentEntries(entries) {
+  const container = document.getElementById('recentEntriesContainer');
+  if (!container) return;
+  container.replaceChildren();
+
+  if (!entries || entries.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-state';
+    const icon = document.createElement('span');
+    icon.className = 'material-icons-round';
+    icon.textContent = 'eco';
+    const text = document.createElement('p');
+    const link = document.createElement('a');
+    link.href = '/tracker';
+    link.textContent = 'Log your first emission →';
+    text.append('No entries yet. ');
+    text.appendChild(link);
+    empty.append(icon, text);
+    container.appendChild(empty);
+    return;
+  }
+
+  const list = document.createElement('div');
+  list.className = 'entry-list';
+  entries.forEach(entry => {
+    const row = document.createElement('div');
+    row.className = 'entry-item';
+
+    const iconWrap = document.createElement('div');
+    iconWrap.className = 'entry-icon';
+    iconWrap.style.background = `${entry.category_color}22`;
+    iconWrap.style.color = entry.category_color;
+    const icon = document.createElement('span');
+    icon.className = 'material-icons-round';
+    icon.textContent = entry.category_icon;
+    iconWrap.appendChild(icon);
+
+    const body = document.createElement('div');
+    body.className = 'entry-body';
+    const title = document.createElement('div');
+    title.className = 'entry-title';
+    title.textContent = entry.category_name;
+    const meta = document.createElement('div');
+    meta.className = 'entry-meta';
+    meta.textContent = `${entry.description || 'No description'} • ${entry.log_date}`;
+    body.append(title, meta);
+
+    const amount = document.createElement('div');
+    amount.className = 'entry-amount';
+    amount.textContent = `${Number(entry.amount).toFixed(2)} kg`;
+
+    row.append(iconWrap, body, amount);
+    list.appendChild(row);
+  });
+
+  container.appendChild(list);
+}
+
 // Draw initially if data is present
 drawCategoryChart(catLabels, catValues, catColors);
 
@@ -390,10 +469,7 @@ function fetchDashboardData() {
       }
 
       // 2. Update progress bar
-      document.getElementById('goalProgressLabels').innerHTML = `
-        <span>${data.month_total} kg used</span>
-        <span>${data.monthly_target} kg target</span>
-      `;
+      setGoalProgressLabels(data.month_total, data.monthly_target);
       const pBar = document.getElementById('goalProgressBar');
       pBar.style.width = data.goal_pct + '%';
       pBar.className = 'progress-fill';
@@ -406,13 +482,12 @@ function fetchDashboardData() {
       }
 
       // Update goal hint text
-      const hint = document.getElementById('goalHintText');
       if (data.goal_pct >= 100) {
-        hint.innerHTML = '⚠️ You\'ve exceeded your monthly target!';
+        setGoalHint(data.goal_pct);
       } else if (data.goal_pct >= 75) {
-        hint.innerHTML = `📊 You're at ${data.goal_pct}% of your target — be mindful.`;
+        setGoalHint(data.goal_pct);
       } else {
-        hint.innerHTML = `🌱 Great job! You're at ${data.goal_pct}% of your monthly target.`;
+        setGoalHint(data.goal_pct);
       }
 
       // 3. Update trend chart
@@ -426,33 +501,7 @@ function fetchDashboardData() {
       drawCategoryChart(data.cat_labels, data.cat_values, data.cat_colors);
 
       // 5. Update recent entries log list
-      const container = document.getElementById('recentEntriesContainer');
-      if (data.recent_entries.length > 0) {
-        let listHtml = '<div class="entry-list">';
-        data.recent_entries.forEach(entry => {
-          listHtml += `
-            <div class="entry-item">
-              <div class="entry-icon" style="background: ${entry.category_color}22; color: ${entry.category_color}">
-                <span class="material-icons-round">${entry.category_icon}</span>
-              </div>
-              <div class="entry-body">
-                <div class="entry-title">${entry.category_name}</div>
-                <div class="entry-meta">${entry.description || 'No description'} &bull; ${entry.log_date}</div>
-              </div>
-              <div class="entry-amount">${entry.amount.toFixed(2)} kg</div>
-            </div>
-          `;
-        });
-        listHtml += '</div>';
-        container.innerHTML = listHtml;
-      } else {
-        container.innerHTML = `
-          <div class="empty-state">
-            <span class="material-icons-round">eco</span>
-            <p>No entries yet. <a href="/tracker">Log your first emission →</a></p>
-          </div>
-        `;
-      }
+      renderRecentEntries(data.recent_entries);
     })
     .catch(err => console.error('Real-time sync error:', err));
 }

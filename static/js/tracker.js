@@ -116,7 +116,11 @@ if (trackerForm) {
     const btn = trackerForm.querySelector('button[type="submit"]');
     if (btn && trackerForm.checkValidity()) {
       btn.disabled = true;
-      btn.innerHTML = '<span class="material-icons-round">hourglass_empty</span> Logging…';
+      btn.replaceChildren();
+      const icon = document.createElement('span');
+      icon.className = 'material-icons-round';
+      icon.textContent = 'hourglass_empty';
+      btn.append(icon, document.createTextNode(' Logging…'));
     }
   });
 }

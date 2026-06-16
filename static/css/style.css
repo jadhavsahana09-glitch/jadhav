@@ -197,6 +197,13 @@ img { max-width: 100%; }
   transition: all var(--transition);
   flex-shrink: 0;
 }
+.sidebar-footer form { margin: 0; }
+.logout-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+}
 .logout-btn:hover { background: rgba(230,57,70,0.2); color: #E63946; }
 
 /* ── Main Wrapper ───────────────────────────────────────────────── */

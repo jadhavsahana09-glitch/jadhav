@@ -71,7 +71,12 @@ forms.forEach(form => {
     const btn = form.querySelector('button[type="submit"]');
     if (btn) {
       btn.disabled = true;
-      btn.innerHTML = '<span class="material-icons-round" style="animation:spin 0.8s linear infinite">refresh</span> Please wait…';
+      btn.replaceChildren();
+      const icon = document.createElement('span');
+      icon.className = 'material-icons-round';
+      icon.style.animation = 'spin 0.8s linear infinite';
+      icon.textContent = 'refresh';
+      btn.append(icon, document.createTextNode(' Please wait…'));
     }
   });
 });

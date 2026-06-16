@@ -23,6 +23,7 @@
     </div>
 
     <form method="POST" action="{{ url_for('tracker') }}" id="trackerForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <!-- Category Pills -->
       <div class="form-group">
         <label>Category</label>
@@ -204,6 +205,7 @@
           <div class="log-amount">{{ "%.3f"|format(log.amount) }} kg</div>
           <form method="POST" action="{{ url_for('delete_log', log_id=log.id) }}"
                 onsubmit="return confirm('Delete this entry?')">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
             <button type="submit" class="btn-icon btn-icon-danger" title="Delete">
               <span class="material-icons-round">delete</span>
             </button>

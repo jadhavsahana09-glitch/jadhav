@@ -26,11 +26,12 @@
       <p class="auth-card-subtitle">Fill in your details to get started.</p>
 
       <form method="POST" action="{{ url_for('register') }}" id="registerForm" novalidate>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <div class="form-group">
           <label for="name">Full Name</label>
           <div class="input-wrapper">
             <span class="material-icons-round input-icon">person</span>
-            <input type="text" id="name" name="name" placeholder="Jane Doe" required autocomplete="name" />
+            <input type="text" id="name" name="name" placeholder="Jane Doe" required autocomplete="name" aria-required="true" />
           </div>
         </div>
 
@@ -38,7 +39,7 @@
           <label for="identifier">Email or Phone Number</label>
           <div class="input-wrapper">
             <span class="material-icons-round input-icon">account_circle</span>
-            <input type="text" id="identifier" name="identifier" placeholder="you@example.com or +1234567890" required autocomplete="username" />
+            <input type="text" id="identifier" name="identifier" placeholder="you@example.com or +1234567890" required autocomplete="username" aria-required="true" />
           </div>
         </div>
 
