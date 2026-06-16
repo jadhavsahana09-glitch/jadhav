@@ -89,6 +89,120 @@
   </div>
 </div>
 
+<!-- ── AI INSIGHTS + RECOMMENDATIONS ─────────────────────────────── -->
+{% set top_category = category_data[0] if category_data else none %}
+<div class="insight-grid">
+  <div class="card insight-card ai-card">
+    <div class="card-header">
+      <span class="material-icons-round">psychology</span>
+      AI Sustainability Assistant
+    </div>
+    <div class="insight-body">
+      {% if top_category %}
+      <p class="insight-lead">
+        Your highest source this month is {{ top_category.name }} at {{ "%.2f"|format(top_category.total) }} kg CO2.
+      </p>
+      <p>
+        {% if top_category.name|lower == 'transport' %}
+        Consider public transport twice a week to save about 12 kg CO2/month.
+        {% elif top_category.name|lower == 'energy' %}
+        Shift heavy appliance use and switch to LED bulbs to reduce electricity emissions.
+        {% elif top_category.name|lower == 'food' %}
+        Replace a few red-meat meals with vegetarian meals to cut food emissions.
+        {% elif top_category.name|lower == 'shopping' %}
+        Buy durable or second-hand items to reduce your shopping footprint.
+        {% else %}
+        Start with the biggest category first; small repeated changes compound quickly.
+        {% endif %}
+      </p>
+      {% else %}
+      <p class="insight-lead">Start logging emissions to unlock personalized AI suggestions.</p>
+      <p>Your dashboard will identify the biggest source and recommend a reduction action.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card insight-card">
+    <div class="card-header">
+      <span class="material-icons-round">tips_and_updates</span>
+      Carbon Reduction Plan
+    </div>
+    <div class="recommendation-table dashboard-recommendations">
+      <div><strong>Problem</strong><strong>Recommendation</strong></div>
+      <div><span>High transport emissions</span><span>Use public transport or carpool</span></div>
+      <div><span>High electricity use</span><span>Use LED bulbs and efficient appliances</span></div>
+      <div><span>High food footprint</span><span>Reduce red meat and food waste</span></div>
+      <div><span>High shopping footprint</span><span>Choose durable, repairable products</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── GAMIFICATION, COMMUNITY, OFFSET ───────────────────────────── -->
+<div class="engagement-grid dashboard-engagement">
+  <div class="engagement-card">
+    <span class="material-icons-round">stars</span>
+    <strong>{{ (total_entries * 25) + (100 - goal_pct|int) }} Green Points</strong>
+    <p>Earn points for every log, low-emission week, and goal improvement.</p>
+  </div>
+  <div class="engagement-card">
+    <span class="material-icons-round">military_tech</span>
+    <strong>
+      {% if goal_pct < 45 %}Climate Champion{% elif goal_pct < 75 %}Green Warrior{% else %}Eco Beginner{% endif %}
+    </strong>
+    <p>Your sustainability level updates as your footprint drops.</p>
+  </div>
+  <div class="engagement-card">
+    <span class="material-icons-round">local_fire_department</span>
+    <strong>Weekly Challenge</strong>
+    <p>Keep transport under 20 kg CO2 this week and unlock a streak badge.</p>
+  </div>
+  <div class="engagement-card">
+    <span class="material-icons-round">leaderboard</span>
+    <strong>Community Rank #8</strong>
+    <p>Compare with friends, family teams, and college sustainability boards.</p>
+  </div>
+</div>
+
+<div class="offset-goal-grid">
+  <div class="card offset-card">
+    <div class="card-header">
+      <span class="material-icons-round">forest</span>
+      Offset Your Emissions
+    </div>
+    <div class="offset-body">
+      <div>
+        <span class="offset-label">Trees needed</span>
+        <strong>{{ ((month_total / 21)|round(0, 'ceil'))|int if month_total else 1 }}</strong>
+      </div>
+      <div>
+        <span class="offset-label">Carbon credits</span>
+        <strong>{{ "%.3f"|format(month_total / 1000) }}</strong>
+      </div>
+      <div>
+        <span class="offset-label">NGO focus</span>
+        <strong>Reforestation</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="card offset-card">
+    <div class="card-header">
+      <span class="material-icons-round">flag</span>
+      Reduction Goal
+    </div>
+    <div class="goal-progress compact-goal">
+      <div class="goal-labels">
+        <span>Reduce emissions by 20%</span>
+        <span>{{ 100 - goal_pct if goal_pct < 100 else 0 }}% room left</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill fill-success" style="width: {{ 100 - goal_pct if goal_pct < 100 else 0 }}%"></div>
+      </div>
+      <div class="goal-hint">Daily tips, eco challenges, and carbon facts keep users returning.</div>
+    </div>
+  </div>
+</div>
+
 <!-- ── CHARTS ROW ────────────────────────────────────────────────── -->
 <div class="charts-row">
   <div class="card chart-card">

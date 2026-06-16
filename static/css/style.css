@@ -1152,3 +1152,377 @@ textarea {
   .main-wrapper   { margin-left: 0; }
   .sidebar.mobile-open { transform: translateX(0); }
 }
+
+/* Landing calculator, analytics demo, and dashboard engagement */
+.orb { display: none; }
+
+.landing-section {
+  padding: 88px 60px;
+  background: var(--bg-primary);
+}
+
+.landing-section:nth-of-type(even) {
+  background: var(--bg-secondary);
+}
+
+.landing-section-heading {
+  max-width: 780px;
+  margin: 0 auto 34px;
+  text-align: center;
+}
+
+.section-kicker {
+  color: var(--accent-blue);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.section-copy {
+  color: var(--text-secondary);
+  font-size: 15px;
+  margin: -38px auto 0;
+  max-width: 680px;
+}
+
+.calculator-demo-grid,
+.insight-grid,
+.offset-goal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.calculator-demo-grid,
+.demo-dashboard-grid,
+.engagement-grid,
+.goal-demo-panel {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.demo-panel,
+.engagement-card {
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.demo-panel {
+  overflow: hidden;
+}
+
+.demo-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.demo-panel-header .material-icons-round {
+  color: var(--accent-green);
+  font-size: 20px;
+}
+
+.demo-calc-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  padding: 18px;
+}
+
+.demo-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px;
+  background: var(--bg-primary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+}
+
+.demo-field span {
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.demo-field small {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.demo-field input {
+  width: 100%;
+  margin-top: 8px;
+  border: 1px solid rgba(45,106,79,0.18);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  color: var(--text-primary);
+  font: inherit;
+  font-weight: 700;
+  background: #fff;
+}
+
+.demo-total-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 18px 18px;
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  color: #fff;
+  background: linear-gradient(135deg, #1B4332, #1A759F);
+}
+
+.demo-total-card span {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.demo-total-card strong {
+  font-size: 24px;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.recommendation-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.ai-suggestion {
+  margin: 18px;
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  color: #1B4332;
+  background: #d8f3dc;
+  border: 1px solid rgba(45,106,79,0.2);
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.recommendation-table {
+  display: flex;
+  flex-direction: column;
+  margin: 0 18px 18px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.recommendation-table > div {
+  display: grid;
+  grid-template-columns: 0.95fr 1.35fr;
+  gap: 12px;
+  padding: 11px 13px;
+  border-bottom: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.recommendation-table > div:first-child {
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.recommendation-table > div:last-child {
+  border-bottom: none;
+}
+
+.demo-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.landing-chart-box {
+  height: 260px;
+  padding: 16px;
+}
+
+.engagement-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.engagement-card {
+  padding: 18px;
+  min-height: 164px;
+}
+
+.engagement-card .material-icons-round {
+  color: var(--accent-blue);
+  font-size: 28px;
+  margin-bottom: 12px;
+}
+
+.engagement-card strong {
+  display: block;
+  color: var(--text-primary);
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+
+.engagement-card p {
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.goal-demo-panel {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 20px;
+  align-items: center;
+  margin-top: 20px;
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+}
+
+.goal-demo-panel h3 {
+  color: var(--text-primary);
+  font-size: 22px;
+  margin: 0;
+}
+
+.goal-demo-progress {
+  min-width: 0;
+}
+
+.insight-grid,
+.offset-goal-grid {
+  width: 100%;
+}
+
+.insight-card .insight-body {
+  padding: 18px 20px 20px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.insight-lead {
+  color: var(--text-primary);
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.dashboard-recommendations {
+  margin: 18px 20px 20px;
+}
+
+.dashboard-engagement {
+  max-width: none;
+  width: 100%;
+  margin-top: 0;
+}
+
+.offset-card {
+  min-height: 164px;
+}
+
+.offset-body {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 18px 20px 20px;
+}
+
+.offset-body > div {
+  padding: 14px;
+  background: var(--bg-primary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+}
+
+.offset-label {
+  display: block;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.offset-body strong {
+  color: var(--text-primary);
+  font-size: 20px;
+}
+
+.compact-goal {
+  padding: 18px 20px 20px;
+}
+
+@media (max-width: 1050px) {
+  .demo-dashboard-grid,
+  .engagement-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 780px) {
+  .landing-section {
+    padding: 56px 20px;
+  }
+
+  .landing-nav {
+    gap: 12px;
+  }
+
+  .nav-links {
+    gap: 8px;
+  }
+
+  .nav-links a[href="#calculator-demo"],
+  .nav-links a[href="#impact-dashboard"] {
+    display: none;
+  }
+
+  .calculator-demo-grid,
+  .demo-dashboard-grid,
+  .engagement-grid,
+  .goal-demo-panel,
+  .insight-grid,
+  .offset-goal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .demo-calc-grid,
+  .offset-body {
+    grid-template-columns: 1fr;
+  }
+
+  .section-copy {
+    margin-top: -28px;
+  }
+
+  .demo-total-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .recommendation-table > div {
+    grid-template-columns: 1fr;
+  }
+
+  .landing-chart-box {
+    height: 240px;
+  }
+}

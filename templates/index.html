@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
 <body class="landing-body">
@@ -19,6 +20,8 @@
     Carby Control
   </div>
   <div class="nav-links">
+    <a href="#calculator-demo" class="btn btn-ghost">Calculator</a>
+    <a href="#impact-dashboard" class="btn btn-ghost">Demo</a>
     <a href="{{ url_for('login') }}" class="btn btn-ghost">Log In</a>
     <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started</a>
   </div>
@@ -81,6 +84,139 @@
   </div>
 </section>
 
+<!-- ── PUBLIC CALCULATOR DEMO ───────────────────────────────────── -->
+<section class="landing-section landing-calculator" id="calculator-demo">
+  <div class="landing-section-heading">
+    <p class="section-kicker">Instant footprint calculator</p>
+    <h2 class="section-title">Calculate before you sign up</h2>
+    <p class="section-copy">Visitors can test real emission estimates across transport, electricity, food, and shopping before creating an account.</p>
+  </div>
+
+  <div class="calculator-demo-grid">
+    <div class="demo-panel">
+      <div class="demo-panel-header">
+        <span class="material-icons-round">calculate</span>
+        Carbon Calculator
+      </div>
+      <div class="demo-calc-grid">
+        <label class="demo-field">
+          <span>Transport</span>
+          <small>km by car</small>
+          <input type="number" min="0" value="18" id="demoTransport" />
+        </label>
+        <label class="demo-field">
+          <span>Electricity</span>
+          <small>kWh used</small>
+          <input type="number" min="0" value="7" id="demoElectricity" />
+        </label>
+        <label class="demo-field">
+          <span>Food</span>
+          <small>meat meals</small>
+          <input type="number" min="0" value="1" id="demoFood" />
+        </label>
+        <label class="demo-field">
+          <span>Shopping</span>
+          <small>spend in USD</small>
+          <input type="number" min="0" value="40" id="demoShopping" />
+        </label>
+      </div>
+      <div class="demo-total-card">
+        <span>Estimated daily footprint</span>
+        <strong id="demoTotal">0.00 kg CO2</strong>
+      </div>
+    </div>
+
+    <div class="demo-panel recommendation-panel">
+      <div class="demo-panel-header">
+        <span class="material-icons-round">psychology</span>
+        AI Sustainability Suggestions
+      </div>
+      <div class="ai-suggestion" id="aiSuggestion">
+        Your transport footprint is the highest today. Try public transport twice a week to save about 12 kg CO2/month.
+      </div>
+      <div class="recommendation-table">
+        <div><strong>Problem</strong><strong>Recommendation</strong></div>
+        <div><span>High transport emissions</span><span>Use public transport or carpool</span></div>
+        <div><span>High electricity use</span><span>Switch to LED bulbs and efficient appliances</span></div>
+        <div><span>High food footprint</span><span>Reduce red meat meals</span></div>
+        <div><span>High shopping footprint</span><span>Buy durable or second-hand items</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── DATA VISUALIZATION DEMO ──────────────────────────────────── -->
+<section class="landing-section impact-dashboard" id="impact-dashboard">
+  <div class="landing-section-heading">
+    <p class="section-kicker">Analytics demo</p>
+    <h2 class="section-title">Charts, goals, rewards, and community</h2>
+    <p class="section-copy">A preview of the dashboard experience recruiters expect: category charts, monthly trends, goal tracking, gamification, offsets, and social motivation.</p>
+  </div>
+
+  <div class="demo-dashboard-grid">
+    <div class="demo-panel chart-demo-card">
+      <div class="demo-panel-header">
+        <span class="material-icons-round">bar_chart</span>
+        Emissions by Category
+      </div>
+      <div class="landing-chart-box"><canvas id="landingBarChart"></canvas></div>
+    </div>
+    <div class="demo-panel chart-demo-card">
+      <div class="demo-panel-header">
+        <span class="material-icons-round">show_chart</span>
+        Monthly Trend
+      </div>
+      <div class="landing-chart-box"><canvas id="landingTrendChart"></canvas></div>
+    </div>
+    <div class="demo-panel chart-demo-card">
+      <div class="demo-panel-header">
+        <span class="material-icons-round">pie_chart</span>
+        Carbon Sources
+      </div>
+      <div class="landing-chart-box"><canvas id="landingPieChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="engagement-grid">
+    <div class="engagement-card">
+      <span class="material-icons-round">emoji_events</span>
+      <strong>Green Points</strong>
+      <p>1,240 points earned from logging, challenges, and reductions.</p>
+    </div>
+    <div class="engagement-card">
+      <span class="material-icons-round">military_tech</span>
+      <strong>Badges</strong>
+      <p>Eco Beginner, Green Warrior, and Climate Champion levels.</p>
+    </div>
+    <div class="engagement-card">
+      <span class="material-icons-round">groups</span>
+      <strong>Community</strong>
+      <p>Leaderboard, friend comparison, family goals, and college rankings.</p>
+    </div>
+    <div class="engagement-card">
+      <span class="material-icons-round">forest</span>
+      <strong>Offset Emissions</strong>
+      <p><span id="treesNeeded">2</span> trees or <span id="creditsNeeded">0.02</span> carbon credits estimated from today's demo.</p>
+    </div>
+  </div>
+
+  <div class="goal-demo-panel">
+    <div>
+      <span class="section-kicker">Goal tracking</span>
+      <h3>Reduce emissions by 20%</h3>
+    </div>
+    <div class="goal-demo-progress">
+      <div class="goal-labels">
+        <span>Current progress</span>
+        <strong id="landingGoalPct">70%</strong>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill fill-success" id="landingGoalBar" style="width:70%"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ── FEATURES ───────────────────────────────────────────────────── -->
 <section class="features">
   <!-- Nature image strip -->
@@ -134,5 +270,6 @@
   <p>© 2024 Carby Control. Building a sustainable future, one log at a time.</p>
 </footer>
 
+<script src="{{ url_for('static', filename='js/landing.js') }}"></script>
 </body>
 </html>
