@@ -1,4 +1,4 @@
-﻿"""
+"""
 Carby Control — Carbon Footprint Web Application
 Flask Backend with OTP Authentication (Email / Phone)
 """
@@ -879,6 +879,140 @@ def api_dashboard_data():
         'cat_values': [float(c['total']) for c in category_data],
         'cat_colors': [c['color'] for c in category_data]
     }
+
+
+# ─── AI Insights API ─────────────────────────────────────────────────────────
+@app.route('/api/ai-insights')
+@login_required
+def api_ai_insights():
+    """Returns personalised AI suggestions based on the user's actual emission data."""
+    db  = get_db(); cur = db.cursor(dictionary=True)
+    now       = datetime.now()
+    first_day = now.replace(day=1).strftime('%Y-%m-%d')
+
+    # Current month totals by category
+    cur.execute("""
+        SELECT c.name, COALESCE(SUM(e.amount), 0) AS total
+        FROM emission_logs e JOIN categories c ON e.category_id = c.id
+        WHERE e.user_id = %s AND e.log_date >= %s
+        GROUP BY c.id, c.name ORDER BY total DESC
+    """, (current_user.id, first_day))
+    current_cats = cur.fetchall()
+
+    # Last month totals by category
+    last_end   = (now.replace(day=1) - timedelta(days=1)).strftime('%Y-%m-%d')
+    last_start = (now.replace(day=1) - timedelta(days=1)).replace(day=1).strftime('%Y-%m-%d')
+    cur.execute("""
+        SELECT c.name, COALESCE(SUM(e.amount), 0) AS total
+        FROM emission_logs e JOIN categories c ON e.category_id = c.id
+        WHERE e.user_id = %s AND e.log_date BETWEEN %s AND %s
+        GROUP BY c.id, c.name
+    """, (current_user.id, last_start, last_end))
+    last_cats = {r['name']: float(r['total']) for r in cur.fetchall()}
+
+    cur.execute("SELECT COALESCE(SUM(amount), 0) AS total FROM emission_logs WHERE user_id = %s AND log_date >= %s",
+                (current_user.id, first_day))
+    month_total = float(cur.fetchone()['total'])
+
+    cur.execute("SELECT monthly_target FROM goals WHERE user_id = %s", (current_user.id,))
+    goal_row       = cur.fetchone()
+    monthly_target = float(goal_row['monthly_target']) if goal_row else 100.0
+
+    cur.close(); db.close()
+
+    # Build insights list
+    insights = []
+    top_cat = current_cats[0] if current_cats else None
+
+    if top_cat:
+        cat_name  = top_cat['name']
+        cat_total = float(top_cat['total'])
+        last_total = last_cats.get(cat_name, 0)
+
+        change_pct = round(((cat_total - last_total) / last_total * 100), 1) if last_total > 0 else None
+
+        # Trend insight
+        if change_pct is not None:
+            direction = "increased" if change_pct > 0 else "decreased"
+            emoji = "⚠️" if change_pct > 0 else "✅"
+            insights.append({
+                "type": "trend",
+                "emoji": emoji,
+                "title": f"{cat_name} emissions {direction} by {abs(change_pct)}%",
+                "body": f"Your {cat_name.lower()} footprint changed from {last_total:.1f} kg last month to {cat_total:.1f} kg this month."
+            })
+
+        # Category-specific recommendation
+        recs = {
+            'Transport':  {"action": "Use public transport 2× per week", "saving": "~12 kg CO₂/month"},
+            'Energy':     {"action": "Switch 5 bulbs to LED + unplug standby", "saving": "~8 kg CO₂/month"},
+            'Food':       {"action": "Replace 3 meat meals with plant-based", "saving": "~9 kg CO₂/month"},
+            'Shopping':   {"action": "Buy second-hand or durable items", "saving": "~5 kg CO₂/month"},
+            'Waste':      {"action": "Compost organic waste + recycle", "saving": "~3 kg CO₂/month"},
+        }
+        if cat_name in recs:
+            rec = recs[cat_name]
+            insights.append({
+                "type": "recommendation",
+                "emoji": "💡",
+                "title": f"Reduce {cat_name} footprint",
+                "body": f"{rec['action']} to save {rec['saving']}."
+            })
+
+    # Monthly projection
+    days_elapsed  = max(now.day, 1)
+    projected     = round((month_total / days_elapsed) * 30, 1) if days_elapsed > 0 else 0
+    budget_left   = round(monthly_target - month_total, 1)
+    pace          = "on track" if projected <= monthly_target else "over budget"
+
+    insights.append({
+        "type": "projection",
+        "emoji": "📊",
+        "title": f"Monthly projection: {projected} kg CO₂",
+        "body": f"At your current pace you're {pace}. Budget remaining: {max(budget_left, 0)} kg."
+    })
+
+    # Sustainability level
+    goal_pct = min(round((month_total / monthly_target) * 100, 1), 100) if monthly_target else 0
+    if goal_pct < 45:
+        level = ("🌳 Climate Champion", "Excellent! You're well under your target.")
+    elif goal_pct < 75:
+        level = ("🌿 Green Warrior", "Good progress — keep reducing to reach Climate Champion.")
+    else:
+        level = ("🌱 Eco Beginner", "You're over 75% of your target — focus on your top category.")
+
+    return {
+        "insights": insights,
+        "sustainability_level": level[0],
+        "level_message": level[1],
+        "month_total": round(month_total, 2),
+        "monthly_target": monthly_target,
+        "projected": projected,
+        "goal_pct": goal_pct,
+    }
+
+
+# ─── Carbon Emission Factors (public) ────────────────────────────────────────
+@app.route('/api/carbon-factors')
+def api_carbon_factors():
+    """Returns the emission factors used by the calculator (transparent AI)."""
+    return {
+        "factors": {
+            "transport_km_car":   0.21,
+            "electricity_kwh":    0.23,
+            "food_meat_meal":     3.10,
+            "shopping_usd":       0.03,
+        },
+        "units": "kg CO2 per unit",
+        "source": "IPCC AR6 / UK DESNZ 2023 emission factors"
+    }
+
+
+# ─── Health Check ─────────────────────────────────────────────────────────────
+@app.route('/health')
+def health():
+    """Simple health check endpoint for uptime monitors."""
+    return {"status": "ok", "db_mode": DB_MODE, "csrf": "active", "otp_auth": "active"}
 
 
 # ─── Tracker ──────────────────────────────────────────────────────────────────

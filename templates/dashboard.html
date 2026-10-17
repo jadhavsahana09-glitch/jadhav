@@ -1,4 +1,4 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
 {% block title %}Dashboard — Carby Control{% endblock %}
 {% block page_title %}Dashboard{% endblock %}
 
@@ -96,29 +96,41 @@
     <div class="card-header">
       <span class="material-icons-round">psychology</span>
       AI Sustainability Assistant
+      <span style="margin-left:auto;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;letter-spacing:.5px;">AI</span>
     </div>
     <div class="insight-body">
       {% if top_category %}
       <p class="insight-lead">
-        Your highest source this month is {{ top_category.name }} at {{ "%.2f"|format(top_category.total) }} kg CO2.
+        📊 Top emission source: <strong>{{ top_category.name }}</strong> — {{ "%.2f"|format(top_category.total) }} kg CO₂ this month.
       </p>
-      <p>
+      <div class="ai-insight-detail">
         {% if top_category.name|lower == 'transport' %}
-        Consider public transport twice a week to save about 12 kg CO2/month.
+        <p>🚗 Your transport emissions are highest. <strong>Taking public transport 2× per week</strong> can save approximately 12 kg CO₂/month.</p>
+        <div class="ai-action-chip">💡 Try: Bus/train 2× this week → Save ~3 kg CO₂</div>
         {% elif top_category.name|lower == 'energy' %}
-        Shift heavy appliance use and switch to LED bulbs to reduce electricity emissions.
+        <p>⚡ Energy is your biggest category. <strong>Switching 5 bulbs to LED</strong> and using appliances during off-peak hours saves ~8 kg CO₂/month.</p>
+        <div class="ai-action-chip">💡 Try: Unplug standby devices today → Save ~0.3 kg CO₂</div>
         {% elif top_category.name|lower == 'food' %}
-        Replace a few red-meat meals with vegetarian meals to cut food emissions.
+        <p>🍖 Food is your primary source. <strong>Replacing 3 meat meals with plant-based</strong> alternatives this week saves ~9 kg CO₂.</p>
+        <div class="ai-action-chip">💡 Try: 1 vegetarian day/week → Save ~12 kg CO₂/month</div>
         {% elif top_category.name|lower == 'shopping' %}
-        Buy durable or second-hand items to reduce your shopping footprint.
+        <p>🛍️ Shopping drives your footprint. <strong>Choosing second-hand or durable products</strong> reduces embedded carbon significantly.</p>
+        <div class="ai-action-chip">💡 Try: One repair instead of replace this month</div>
         {% else %}
-        Start with the biggest category first; small repeated changes compound quickly.
+        <p>Start with your highest category. <strong>Small repeated changes compound quickly</strong>.</p>
+        <div class="ai-action-chip">💡 Log daily to get precise AI recommendations</div>
         {% endif %}
-      </p>
+      </div>
+      <div class="ai-monthly-pred">
+        <span class="material-icons-round">trending_up</span>
+        Projected monthly total: <strong>~{{ "%.1f"|format(month_total / (now.day if now.day > 0 else 1) * 30) }} kg CO₂</strong>
+      </div>
       {% else %}
-      <p class="insight-lead">Start logging emissions to unlock personalized AI suggestions.</p>
-      <p>Your dashboard will identify the biggest source and recommend a reduction action.</p>
+      <p class="insight-lead">🌱 Start logging emissions to unlock personalized AI suggestions.</p>
+      <p>Your AI assistant will identify your biggest emission source and generate a custom reduction plan.</p>
+      <div class="ai-action-chip">💡 First step: Log your transport for today</div>
       {% endif %}
+
     </div>
   </div>
 
@@ -129,11 +141,20 @@
     </div>
     <div class="recommendation-table dashboard-recommendations">
       <div><strong>Problem</strong><strong>Recommendation</strong></div>
-      <div><span>High transport emissions</span><span>Use public transport or carpool</span></div>
-      <div><span>High electricity use</span><span>Use LED bulbs and efficient appliances</span></div>
-      <div><span>High food footprint</span><span>Reduce red meat and food waste</span></div>
-      <div><span>High shopping footprint</span><span>Choose durable, repairable products</span></div>
+      <div {% if top_category and top_category.name|lower == 'transport' %}style="background:rgba(74,222,128,0.1);border-radius:6px;"{% endif %}>
+        <span>🚗 High transport</span><span>Use public transport or carpool</span>
+      </div>
+      <div {% if top_category and top_category.name|lower == 'energy' %}style="background:rgba(74,222,128,0.1);border-radius:6px;"{% endif %}>
+        <span>⚡ High electricity</span><span>Use LED bulbs and efficient appliances</span>
+      </div>
+      <div {% if top_category and top_category.name|lower == 'food' %}style="background:rgba(74,222,128,0.1);border-radius:6px;"{% endif %}>
+        <span>🍖 High food</span><span>Reduce red meat and food waste</span>
+      </div>
+      <div {% if top_category and top_category.name|lower == 'shopping' %}style="background:rgba(74,222,128,0.1);border-radius:6px;"{% endif %}>
+        <span>🛍️ High shopping</span><span>Choose durable, repairable products</span>
+      </div>
     </div>
+
   </div>
 </div>
 
@@ -146,15 +167,15 @@
   </div>
   <div class="engagement-card">
     <span class="material-icons-round">military_tech</span>
-    <strong>
-      {% if goal_pct < 45 %}Climate Champion{% elif goal_pct < 75 %}Green Warrior{% else %}Eco Beginner{% endif %}
+    <strong id="sustainabilityLevel">
+      {% if goal_pct < 45 %}🌳 Climate Champion{% elif goal_pct < 75 %}🌿 Green Warrior{% else %}🌱 Eco Beginner{% endif %}
     </strong>
-    <p>Your sustainability level updates as your footprint drops.</p>
+    <p>Your sustainability level updates live as your footprint drops.</p>
   </div>
   <div class="engagement-card">
     <span class="material-icons-round">local_fire_department</span>
     <strong>Weekly Challenge</strong>
-    <p>Keep transport under 20 kg CO2 this week and unlock a streak badge.</p>
+    <p>Keep transport under 20 kg CO₂ this week and unlock a streak badge.</p>
   </div>
   <div class="engagement-card">
     <span class="material-icons-round">leaderboard</span>
@@ -162,6 +183,7 @@
     <p>Compare with friends, family teams, and college sustainability boards.</p>
   </div>
 </div>
+
 
 <div class="offset-goal-grid">
   <div class="card offset-card">
@@ -508,5 +530,29 @@ function fetchDashboardData() {
 
 // Fetch dashboard data every 5 seconds (5000ms)
 setInterval(fetchDashboardData, 5000);
+
+// ── AI Insights Polling ───────────────────────────────────────────────────────
+function fetchAIInsights() {
+  fetch('/api/ai-insights')
+    .then(res => res.ok ? res.json() : null)
+    .then(data => {
+      if (!data) return;
+      // Update sustainability level badge if element exists
+      const levelEl = document.getElementById('sustainabilityLevel');
+      if (levelEl) {
+        levelEl.textContent = data.sustainability_level;
+        levelEl.title = data.level_message;
+      }
+      // Update projected total if element exists
+      const projEl = document.getElementById('projectedTotal');
+      if (projEl) projEl.textContent = `${data.projected} kg CO₂`;
+    })
+    .catch(() => {});
+}
+
+// Fetch AI insights on load and every 30 seconds
+fetchAIInsights();
+setInterval(fetchAIInsights, 30000);
 </script>
 {% endblock %}
+

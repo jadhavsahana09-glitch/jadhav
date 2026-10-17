@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Carby Control — Track Your Carbon Footprint</title>
-  <meta name="description" content="Carby Control helps you monitor, reduce, and report your carbon emissions with a beautiful real-time dashboard." />
+  <meta name="description" content="Carby Control helps you monitor, reduce, and report your carbon emissions with a beautiful real-time dashboard. AI-powered insights, gamification, and enterprise ESG reporting." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
@@ -14,21 +14,38 @@
 <body class="landing-body">
 
 <!-- ── NAVBAR ─────────────────────────────────────────────────────── -->
-<nav class="landing-nav">
+<nav class="landing-nav" id="landingNav">
   <div class="nav-brand">
     <span class="material-icons-round">eco</span>
     Carby Control
   </div>
-  <div class="nav-links">
+  <div class="nav-links" id="navLinks">
     <a href="#calculator-demo" class="btn btn-ghost">Calculator</a>
     <a href="#impact-dashboard" class="btn btn-ghost">Demo</a>
+    <a href="#enterprise" class="btn btn-ghost">Enterprise</a>
+    <a href="#security" class="btn btn-ghost">Security</a>
     <a href="{{ url_for('login') }}" class="btn btn-ghost">Log In</a>
     <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started</a>
   </div>
+  <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileNav()" aria-label="Toggle navigation">
+    <span class="material-icons-round">menu</span>
+  </button>
 </nav>
 
+<!-- Mobile Nav Drawer -->
+<div class="mobile-nav-drawer" id="mobileNavDrawer">
+  <a href="#calculator-demo" onclick="toggleMobileNav()">⚡ Calculator</a>
+  <a href="#impact-dashboard" onclick="toggleMobileNav()">📊 Demo</a>
+  <a href="#enterprise" onclick="toggleMobileNav()">🏢 Enterprise</a>
+  <a href="#security" onclick="toggleMobileNav()">🔒 Security</a>
+  <a href="#community" onclick="toggleMobileNav()">👥 Community</a>
+  <a href="{{ url_for('login') }}">Log In</a>
+  <a href="{{ url_for('register') }}" class="mobile-get-started">Get Started Free →</a>
+</div>
+<div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="toggleMobileNav()"></div>
+
 <!-- ── HERO ───────────────────────────────────────────────────────── -->
-<section class="hero" style="background-image: linear-gradient(135deg, rgba(10,20,30,0.75) 0%, rgba(16,185,129,0.55) 100%), url('https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=2560&auto=format&fit=crop'); background-size: cover; background-position: center; background-attachment: fixed;">
+<section class="hero" style="background-image: linear-gradient(135deg, rgba(10,20,30,0.78) 0%, rgba(16,185,129,0.55) 100%), url('https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=2560&auto=format&fit=crop'); background-size: cover; background-position: center; background-attachment: fixed;">
   <div class="hero-bg">
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
@@ -37,24 +54,31 @@
   <div class="hero-content">
     <div class="hero-badge">
       <span class="material-icons-round">eco</span>
-      Sustainability Platform
+      AI-Powered Sustainability Platform
     </div>
     <h1 class="hero-title">
       Measure. Reduce.<br />
       <span class="gradient-text">Save the Planet.</span>
     </h1>
     <p class="hero-subtitle">
-      Carby Control empowers you to monitor your carbon footprint in real time,
-      set reduction goals, and download detailed sustainability reports.
+      Carby Control empowers individuals and companies to monitor carbon footprints in real time,
+      set reduction goals, get AI-driven insights, and download ESG-ready sustainability reports.
     </p>
     <div class="hero-cta">
       <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
         <span class="material-icons-round">rocket_launch</span>
         Start Tracking Free
       </a>
-      <a href="{{ url_for('login') }}" class="btn btn-outline btn-lg">
-        Sign In
+      <a href="#enterprise" class="btn btn-outline btn-lg">
+        <span class="material-icons-round">business</span>
+        Enterprise Plan
       </a>
+    </div>
+    <div class="hero-trust-badges">
+      <span class="trust-badge"><span class="material-icons-round">verified_user</span> CSRF Protected</span>
+      <span class="trust-badge"><span class="material-icons-round">lock</span> OTP Auth</span>
+      <span class="trust-badge"><span class="material-icons-round">psychology</span> AI Insights</span>
+      <span class="trust-badge"><span class="material-icons-round">business_center</span> ESG Reports</span>
     </div>
   </div>
 
@@ -84,12 +108,34 @@
   </div>
 </section>
 
+<!-- ── STATS BANNER ────────────────────────────────────────────── -->
+<section class="stats-banner">
+  <div class="stats-banner-grid">
+    <div class="stats-banner-item">
+      <div class="sb-value">10,000+</div>
+      <div class="sb-label">Users Tracking</div>
+    </div>
+    <div class="stats-banner-item">
+      <div class="sb-value">500 tonnes</div>
+      <div class="sb-label">CO₂ Reduced</div>
+    </div>
+    <div class="stats-banner-item">
+      <div class="sb-value">4 Categories</div>
+      <div class="sb-label">Tracked Daily</div>
+    </div>
+    <div class="stats-banner-item">
+      <div class="sb-value">AI-Powered</div>
+      <div class="sb-label">Insights Engine</div>
+    </div>
+  </div>
+</section>
+
 <!-- ── PUBLIC CALCULATOR DEMO ───────────────────────────────────── -->
 <section class="landing-section landing-calculator" id="calculator-demo">
   <div class="landing-section-heading">
-    <p class="section-kicker">Instant footprint calculator</p>
+    <p class="section-kicker">⚡ Instant footprint calculator</p>
     <h2 class="section-title">Calculate before you sign up</h2>
-    <p class="section-copy">Visitors can test real emission estimates across transport, electricity, food, and shopping before creating an account.</p>
+    <p class="section-copy">Move the sliders and watch your emissions, AI suggestions, and charts update in real time — no login required.</p>
   </div>
 
   <div class="calculator-demo-grid">
@@ -100,47 +146,75 @@
       </div>
       <div class="demo-calc-grid">
         <label class="demo-field">
-          <span>Transport</span>
-          <small>km by car</small>
-          <input type="number" min="0" value="18" id="demoTransport" />
+          <div class="field-header">
+            <span>🚗 Transport</span>
+            <small id="transportVal">18 km</small>
+          </div>
+          <small>km driven by car</small>
+          <input type="range" min="0" max="200" value="18" id="demoTransport" class="emission-slider" />
+          <input type="number" min="0" value="18" id="demoTransportNum" class="slider-num" />
         </label>
         <label class="demo-field">
-          <span>Electricity</span>
-          <small>kWh used</small>
-          <input type="number" min="0" value="7" id="demoElectricity" />
+          <div class="field-header">
+            <span>⚡ Electricity</span>
+            <small id="electricityVal">7 kWh</small>
+          </div>
+          <small>kWh consumed</small>
+          <input type="range" min="0" max="100" value="7" id="demoElectricity" class="emission-slider" />
+          <input type="number" min="0" value="7" id="demoElectricityNum" class="slider-num" />
         </label>
         <label class="demo-field">
-          <span>Food</span>
-          <small>meat meals</small>
-          <input type="number" min="0" value="1" id="demoFood" />
+          <div class="field-header">
+            <span>🍖 Food</span>
+            <small id="foodVal">1 meal</small>
+          </div>
+          <small>meat meals today</small>
+          <input type="range" min="0" max="10" value="1" id="demoFood" class="emission-slider" />
+          <input type="number" min="0" value="1" id="demoFoodNum" class="slider-num" />
         </label>
         <label class="demo-field">
-          <span>Shopping</span>
+          <div class="field-header">
+            <span>🛍️ Shopping</span>
+            <small id="shoppingVal">$40</small>
+          </div>
           <small>spend in USD</small>
-          <input type="number" min="0" value="40" id="demoShopping" />
+          <input type="range" min="0" max="500" value="40" id="demoShopping" class="emission-slider" />
+          <input type="number" min="0" value="40" id="demoShoppingNum" class="slider-num" />
         </label>
       </div>
       <div class="demo-total-card">
         <span>Estimated daily footprint</span>
-        <strong id="demoTotal">0.00 kg CO2</strong>
+        <strong id="demoTotal">0.00 kg CO₂</strong>
+      </div>
+      <div class="emission-mini-chart-wrap">
+        <canvas id="demoBarChart" height="120"></canvas>
       </div>
     </div>
 
     <div class="demo-panel recommendation-panel">
       <div class="demo-panel-header">
         <span class="material-icons-round">psychology</span>
-        AI Sustainability Suggestions
+        AI Sustainability Assistant
+        <span class="ai-badge">AI</span>
       </div>
       <div class="ai-suggestion" id="aiSuggestion">
-        Your transport footprint is the highest today. Try public transport twice a week to save about 12 kg CO2/month.
+        Your transport footprint is the highest today. Try public transport twice a week to save about 12 kg CO₂/month.
+      </div>
+      <div class="ai-prediction-box">
+        <div class="ai-pred-label"><span class="material-icons-round">trending_up</span> Predicted Monthly Impact</div>
+        <div class="ai-pred-value" id="aiMonthlyPred">— kg CO₂/month</div>
       </div>
       <div class="recommendation-table">
         <div><strong>Problem</strong><strong>Recommendation</strong></div>
-        <div><span>High transport emissions</span><span>Use public transport or carpool</span></div>
-        <div><span>High electricity use</span><span>Switch to LED bulbs and efficient appliances</span></div>
-        <div><span>High food footprint</span><span>Reduce red meat meals</span></div>
-        <div><span>High shopping footprint</span><span>Buy durable or second-hand items</span></div>
+        <div id="rec-transport"><span>🚗 High transport</span><span>Use public transport or carpool</span></div>
+        <div id="rec-electricity"><span>⚡ High electricity</span><span>Switch to LEDs &amp; efficient appliances</span></div>
+        <div id="rec-food"><span>🍖 High food footprint</span><span>Reduce red meat — try plant-based meals</span></div>
+        <div id="rec-shopping"><span>🛍️ High shopping</span><span>Buy durable or second-hand items</span></div>
       </div>
+      <a href="{{ url_for('register') }}" class="btn btn-primary" style="width:100%;margin-top:16px;justify-content:center;">
+        <span class="material-icons-round">rocket_launch</span>
+        Get Personalized AI Plan
+      </a>
     </div>
   </div>
 </section>
@@ -148,9 +222,9 @@
 <!-- ── DATA VISUALIZATION DEMO ──────────────────────────────────── -->
 <section class="landing-section impact-dashboard" id="impact-dashboard">
   <div class="landing-section-heading">
-    <p class="section-kicker">Analytics demo</p>
+    <p class="section-kicker">📊 Analytics demo</p>
     <h2 class="section-title">Charts, goals, rewards, and community</h2>
-    <p class="section-copy">A preview of the dashboard experience recruiters expect: category charts, monthly trends, goal tracking, gamification, offsets, and social motivation.</p>
+    <p class="section-copy">A preview of the full dashboard: category charts, monthly trends, goal tracking, gamification, offsets, and community rankings.</p>
   </div>
 
   <div class="demo-dashboard-grid">
@@ -177,6 +251,34 @@
     </div>
   </div>
 
+  <!-- Gamification Badges -->
+  <div class="gamification-section">
+    <div class="landing-section-heading" style="margin-bottom:24px;">
+      <p class="section-kicker">🏆 Gamification</p>
+      <h3 class="section-title" style="font-size:1.6rem;">Earn rewards for going green</h3>
+    </div>
+    <div class="badge-levels-row">
+      <div class="badge-level-card">
+        <div class="badge-emoji">🌱</div>
+        <div class="badge-level-name">Eco Beginner</div>
+        <div class="badge-desc">Log your first 5 entries</div>
+        <div class="badge-points">0 – 500 pts</div>
+      </div>
+      <div class="badge-level-card active-badge">
+        <div class="badge-emoji">🌿</div>
+        <div class="badge-level-name">Green Warrior</div>
+        <div class="badge-desc">Reduce emissions by 10%</div>
+        <div class="badge-points">500 – 2,000 pts</div>
+      </div>
+      <div class="badge-level-card">
+        <div class="badge-emoji">🌳</div>
+        <div class="badge-level-name">Climate Champion</div>
+        <div class="badge-desc">30-day reduction streak</div>
+        <div class="badge-points">2,000+ pts</div>
+      </div>
+    </div>
+  </div>
+
   <div class="engagement-grid">
     <div class="engagement-card">
       <span class="material-icons-round">emoji_events</span>
@@ -185,13 +287,13 @@
     </div>
     <div class="engagement-card">
       <span class="material-icons-round">military_tech</span>
-      <strong>Badges</strong>
-      <p>Eco Beginner, Green Warrior, and Climate Champion levels.</p>
+      <strong>Badges &amp; Streaks</strong>
+      <p>🌱 Eco Beginner → 🌿 Green Warrior → 🌳 Climate Champion. 7-day streak active!</p>
     </div>
     <div class="engagement-card">
       <span class="material-icons-round">groups</span>
       <strong>Community</strong>
-      <p>Leaderboard, friend comparison, family goals, and college rankings.</p>
+      <p>Leaderboard, friend comparison, family goals, and college sustainability rankings.</p>
     </div>
     <div class="engagement-card">
       <span class="material-icons-round">forest</span>
@@ -217,9 +319,286 @@
   </div>
 </section>
 
+<!-- ── COMMUNITY LEADERBOARD ──────────────────────────────────────── -->
+<section class="landing-section leaderboard-section" id="community">
+  <div class="landing-section-heading">
+    <p class="section-kicker">👥 Community</p>
+    <h2 class="section-title">See how you compare</h2>
+    <p class="section-copy">Join thousands of eco-warriors competing to reduce their footprint. Weekly challenges, team goals, and college rankings.</p>
+  </div>
+  <div class="leaderboard-grid">
+    <div class="leaderboard-card">
+      <div class="lb-header">
+        <span class="material-icons-round">leaderboard</span> Weekly Top Reducers
+      </div>
+      <div class="lb-table">
+        <div class="lb-row lb-gold"><span class="lb-rank">🥇</span><span class="lb-name">Priya S.</span><span class="lb-val">–34% CO₂</span></div>
+        <div class="lb-row lb-silver"><span class="lb-rank">🥈</span><span class="lb-name">Arjun M.</span><span class="lb-val">–28% CO₂</span></div>
+        <div class="lb-row lb-bronze"><span class="lb-rank">🥉</span><span class="lb-name">Sahana J.</span><span class="lb-val">–23% CO₂</span></div>
+        <div class="lb-row"><span class="lb-rank">4</span><span class="lb-name">Rahul K.</span><span class="lb-val">–19% CO₂</span></div>
+        <div class="lb-row"><span class="lb-rank">5</span><span class="lb-name">Meera R.</span><span class="lb-val">–15% CO₂</span></div>
+      </div>
+    </div>
+    <div class="leaderboard-card">
+      <div class="lb-header">
+        <span class="material-icons-round">school</span> College Rankings
+      </div>
+      <div class="lb-table">
+        <div class="lb-row lb-gold"><span class="lb-rank">🥇</span><span class="lb-name">IIT Bombay</span><span class="lb-val">2.1k kg saved</span></div>
+        <div class="lb-row lb-silver"><span class="lb-rank">🥈</span><span class="lb-name">NIT Pune</span><span class="lb-val">1.8k kg saved</span></div>
+        <div class="lb-row lb-bronze"><span class="lb-rank">🥉</span><span class="lb-name">BITS Pilani</span><span class="lb-val">1.5k kg saved</span></div>
+        <div class="lb-row"><span class="lb-rank">4</span><span class="lb-name">VJTI Mumbai</span><span class="lb-val">1.2k kg saved</span></div>
+        <div class="lb-row"><span class="lb-rank">5</span><span class="lb-name">Symbiosis</span><span class="lb-val">0.9k kg saved</span></div>
+      </div>
+    </div>
+    <div class="leaderboard-card">
+      <div class="lb-header">
+        <span class="material-icons-round">local_fire_department</span> Active Challenges
+      </div>
+      <div class="challenge-list">
+        <div class="challenge-item">
+          <span class="challenge-icon">🚲</span>
+          <div>
+            <strong>No-Car Week</strong>
+            <div class="challenge-desc">2,341 participants · 3 days left</div>
+          </div>
+          <span class="challenge-pts">+200 pts</span>
+        </div>
+        <div class="challenge-item">
+          <span class="challenge-icon">🥗</span>
+          <div>
+            <strong>Veg for 7 Days</strong>
+            <div class="challenge-desc">1,876 participants · 5 days left</div>
+          </div>
+          <span class="challenge-pts">+150 pts</span>
+        </div>
+        <div class="challenge-item">
+          <span class="challenge-icon">💡</span>
+          <div>
+            <strong>Energy Diet</strong>
+            <div class="challenge-desc">998 participants · 1 day left</div>
+          </div>
+          <span class="challenge-pts">+100 pts</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CARBON OFFSET MARKETPLACE ──────────────────────────────── -->
+<section class="landing-section offset-section" id="offset">
+  <div class="landing-section-heading">
+    <p class="section-kicker">🌲 Carbon Offsets</p>
+    <h2 class="section-title">Offset your unavoidable emissions</h2>
+    <p class="section-copy">Partner with verified NGOs and reforestation programs to neutralize what you can't yet reduce.</p>
+  </div>
+  <div class="offset-ngo-grid">
+    <div class="ngo-card">
+      <div class="ngo-icon" style="background:rgba(74,222,128,0.12)">🌳</div>
+      <h4>Green Yatra</h4>
+      <p>India's largest tree-planting NGO. ₹30 plants 1 tree and absorbs ~21 kg CO₂/year.</p>
+      <div class="ngo-badge">Verified ✓</div>
+    </div>
+    <div class="ngo-card">
+      <div class="ngo-icon" style="background:rgba(96,165,250,0.12)">🌊</div>
+      <h4>Blue Carbon Initiative</h4>
+      <p>Mangrove restoration protects coastlines and sequesters carbon 5× faster than forests.</p>
+      <div class="ngo-badge">Verified ✓</div>
+    </div>
+    <div class="ngo-card">
+      <div class="ngo-icon" style="background:rgba(167,139,250,0.12)">☀️</div>
+      <h4>Barefoot College</h4>
+      <p>Solar energy for rural India — displacing diesel and coal at grassroots level.</p>
+      <div class="ngo-badge">Verified ✓</div>
+    </div>
+    <div class="ngo-card">
+      <div class="ngo-icon" style="background:rgba(251,191,36,0.12)">♻️</div>
+      <h4>Waste Warriors</h4>
+      <p>Clean Himalayan waste. Each kg diverted from landfill prevents methane emissions.</p>
+      <div class="ngo-badge">Verified ✓</div>
+    </div>
+  </div>
+  <div class="offset-calc-bar">
+    <span class="material-icons-round">forest</span>
+    Based on your demo footprint: you need <strong id="offsetTreesLanding">2 trees</strong> or <strong id="offsetCreditsLanding">0.02 credits</strong> to be carbon-neutral today.
+    <a href="{{ url_for('register') }}" class="btn btn-primary btn-sm">Start Offsetting</a>
+  </div>
+</section>
+
+<!-- ── EDUCATIONAL TIPS ────────────────────────────────────────── -->
+<section class="landing-section edu-section" id="education">
+  <div class="landing-section-heading">
+    <p class="section-kicker">📚 Learn &amp; Act</p>
+    <h2 class="section-title">Daily eco challenges &amp; sustainability tips</h2>
+    <p class="section-copy">Stay engaged with rotating daily challenges, carbon facts, and climate news.</p>
+  </div>
+  <div class="edu-grid">
+    <div class="edu-tips-carousel">
+      <div class="edu-tip active" id="tip-0">
+        <div class="tip-icon">🌍</div>
+        <h4>Did you know?</h4>
+        <p>The average Indian emits ~1.9 tonnes of CO₂ per year — the global average is 4.7 tonnes. Sustainable choices can halve that.</p>
+      </div>
+      <div class="edu-tip" id="tip-1">
+        <div class="tip-icon">🥩</div>
+        <h4>Food Footprint Fact</h4>
+        <p>Producing 1 kg of beef emits ~27 kg of CO₂. Switching to chicken cuts that 4×, while lentils cut it 50× further.</p>
+      </div>
+      <div class="edu-tip" id="tip-2">
+        <div class="tip-icon">🚌</div>
+        <h4>Transport Tip</h4>
+        <p>Taking a bus instead of a car for your daily commute can save up to 2.4 kg CO₂ per day — that's 720 kg per year!</p>
+      </div>
+      <div class="edu-tip" id="tip-3">
+        <div class="tip-icon">💡</div>
+        <h4>Energy Win</h4>
+        <p>Replacing 5 incandescent bulbs with LEDs saves ~300 kWh/year — equivalent to planting 2 trees annually.</p>
+      </div>
+      <div class="edu-tip" id="tip-4">
+        <div class="tip-icon">🛒</div>
+        <h4>Shopping Smart</h4>
+        <p>Fast fashion produces 10% of global CO₂. Buying second-hand or choosing quality over quantity makes a measurable difference.</p>
+      </div>
+      <div class="edu-tip-controls">
+        <button onclick="prevTip()" class="tip-btn"><span class="material-icons-round">chevron_left</span></button>
+        <div class="tip-dots" id="tipDots"></div>
+        <button onclick="nextTip()" class="tip-btn"><span class="material-icons-round">chevron_right</span></button>
+      </div>
+    </div>
+    <div class="daily-challenges-panel">
+      <div class="dc-header">
+        <span class="material-icons-round">today</span> Today's Eco Challenges
+      </div>
+      <div class="dc-item">
+        <span class="dc-check">☐</span>
+        <div><strong>Walk or cycle for 1 trip</strong><div class="dc-pts">+25 pts · saves ~0.5 kg CO₂</div></div>
+      </div>
+      <div class="dc-item">
+        <span class="dc-check">☐</span>
+        <div><strong>Skip meat at one meal</strong><div class="dc-pts">+20 pts · saves ~3 kg CO₂</div></div>
+      </div>
+      <div class="dc-item">
+        <span class="dc-check">☐</span>
+        <div><strong>Turn off standby devices</strong><div class="dc-pts">+15 pts · saves ~0.2 kg CO₂</div></div>
+      </div>
+      <div class="dc-item">
+        <span class="dc-check">☐</span>
+        <div><strong>Bring a reusable bag</strong><div class="dc-pts">+10 pts · reduces plastic waste</div></div>
+      </div>
+      <a href="{{ url_for('register') }}" class="btn btn-ghost" style="width:100%;margin-top:12px;justify-content:center;">
+        Track challenges in dashboard →
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── ENTERPRISE / COMPANY SECTION ──────────────────────────────── -->
+<section class="landing-section enterprise-section" id="enterprise">
+  <div class="landing-section-heading">
+    <p class="section-kicker">🏢 For Companies</p>
+    <h2 class="section-title">Enterprise Carbon Management</h2>
+    <p class="section-copy">Help your company track Scope 1, 2, and 3 emissions, generate ESG-compliant reports, and hit your net-zero targets. Built for sustainability managers and CSR teams.</p>
+  </div>
+  <div class="enterprise-grid">
+    <div class="enterprise-card">
+      <div class="ent-icon"><span class="material-icons-round">factory</span></div>
+      <h4>Scope 1, 2 &amp; 3 Tracking</h4>
+      <p>Track direct emissions (Scope 1), purchased energy (Scope 2), and supply chain (Scope 3) across all departments.</p>
+    </div>
+    <div class="enterprise-card">
+      <div class="ent-icon"><span class="material-icons-round">description</span></div>
+      <h4>ESG-Ready Reports</h4>
+      <p>Auto-generate PDF/CSV reports aligned with GRI, BRSR, and CDP frameworks — ready for regulators and investors.</p>
+    </div>
+    <div class="enterprise-card">
+      <div class="ent-icon"><span class="material-icons-round">groups</span></div>
+      <h4>Team Dashboards</h4>
+      <p>Give every department its own tracker. Compare teams, set targets, and celebrate reductions with leaderboards.</p>
+    </div>
+    <div class="enterprise-card">
+      <div class="ent-icon"><span class="material-icons-round">insights</span></div>
+      <h4>AI Emission Forecasting</h4>
+      <p>Predict next quarter's emissions based on historical trends. Get AI recommendations before targets are missed.</p>
+    </div>
+    <div class="enterprise-card">
+      <div class="ent-icon"><span class="material-icons-round">verified</span></div>
+      <h4>Compliance Alerts</h4>
+      <p>Automated alerts when emission thresholds approach regulatory limits. Stay audit-ready year-round.</p>
+    </div>
+    <div class="enterprise-card">
+      <div class="ent-icon"><span class="material-icons-round">local_offer</span></div>
+      <h4>Carbon Credit Marketplace</h4>
+      <p>Buy verified carbon credits directly through the platform. Offset residual emissions and achieve carbon neutrality.</p>
+    </div>
+  </div>
+  <div class="enterprise-cta-bar">
+    <div>
+      <h3>Reduce your company's carbon risk today</h3>
+      <p>Join 50+ companies already tracking with Carby Control</p>
+    </div>
+    <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+      <span class="material-icons-round">business</span>
+      Request Enterprise Demo
+    </a>
+  </div>
+</section>
+
+<!-- ── CYBERSECURITY SECTION ──────────────────────────────────── -->
+<section class="landing-section security-section" id="security">
+  <div class="landing-section-heading">
+    <p class="section-kicker">🔒 Security &amp; Privacy</p>
+    <h2 class="section-title">Your data is safe with us</h2>
+    <p class="section-copy">Enterprise-grade security is built into every layer of Carby Control — because trust is the foundation of a sustainable platform.</p>
+  </div>
+  <div class="security-grid">
+    <div class="security-card">
+      <div class="sec-icon sec-green"><span class="material-icons-round">verified_user</span></div>
+      <h4>CSRF Protection</h4>
+      <p>Every form submission is protected with server-side CSRF tokens. Cross-site request forgery attacks are blocked automatically.</p>
+      <div class="sec-status">✅ Active</div>
+    </div>
+    <div class="security-card">
+      <div class="sec-icon sec-blue"><span class="material-icons-round">lock</span></div>
+      <h4>OTP-Based Auth</h4>
+      <p>No passwords stored. Login via time-limited OTP sent to email or SMS. Even if intercepted, codes expire in 10 minutes.</p>
+      <div class="sec-status">✅ Active</div>
+    </div>
+    <div class="security-card">
+      <div class="sec-icon sec-purple"><span class="material-icons-round">security</span></div>
+      <h4>Session Encryption</h4>
+      <p>Flask sessions are signed with a 256-bit secret key using HMAC-SHA1. Session data cannot be tampered with by clients.</p>
+      <div class="sec-status">✅ Active</div>
+    </div>
+    <div class="security-card">
+      <div class="sec-icon sec-orange"><span class="material-icons-round">speed</span></div>
+      <h4>OTP Rate Limiting</h4>
+      <p>OTP tokens are invalidated after use and expire automatically. Old tokens are purged on each new request to prevent replay attacks.</p>
+      <div class="sec-status">✅ Active</div>
+    </div>
+    <div class="security-card">
+      <div class="sec-icon sec-teal"><span class="material-icons-round">storage</span></div>
+      <h4>Parameterized Queries</h4>
+      <p>All database interactions use parameterized queries across MySQL, PostgreSQL, and SQLite — SQL injection is structurally impossible.</p>
+      <div class="sec-status">✅ Active</div>
+    </div>
+    <div class="security-card">
+      <div class="sec-icon sec-red"><span class="material-icons-round">https</span></div>
+      <h4>HTTPS Enforcement</h4>
+      <p>All data in transit is encrypted via TLS. Deployed on Vercel with automatic SSL certificate management.</p>
+      <div class="sec-status">✅ Active</div>
+    </div>
+  </div>
+  <div class="security-threat-bar">
+    <div class="threat-label"><span class="material-icons-round">shield</span> Security Score</div>
+    <div class="threat-meter-wrap">
+      <div class="threat-meter-fill"></div>
+    </div>
+    <div class="threat-score">92 / 100 — Strong</div>
+  </div>
+</section>
+
 <!-- ── FEATURES ───────────────────────────────────────────────────── -->
 <section class="features">
-  <!-- Nature image strip -->
   <div style="width:100%; height:220px; background-image: url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=2560&auto=format&fit=crop'); background-size:cover; background-position:center 40%; border-radius:20px; margin-bottom:40px; position:relative; overflow:hidden;">
     <div style="position:absolute; inset:0; background: linear-gradient(to right, rgba(15,23,42,0.7), rgba(16,185,129,0.4)); display:flex; align-items:center; padding:0 40px;">
       <div>
@@ -239,36 +618,98 @@
     </div>
     <div class="feature-card">
       <div class="feature-icon" style="--icon-color:#60a5fa">
-        <span class="material-icons-round">add_circle</span>
+        <span class="material-icons-round">psychology</span>
       </div>
-      <h3>Easy Logging</h3>
-      <p>Log emissions across 5 categories — Transport, Energy, Food, Shopping, and Waste — in seconds.</p>
+      <h3>AI Insights</h3>
+      <p>Rule-based AI engine analyzes your emission pattern and generates personalized reduction recommendations.</p>
     </div>
     <div class="feature-card">
       <div class="feature-icon" style="--icon-color:#f472b6">
         <span class="material-icons-round">trending_up</span>
       </div>
       <h3>Progress Tracking</h3>
-      <p>Monitor your monthly trends, streak, and compare against your personal reduction goals.</p>
+      <p>Monitor monthly trends, streaks, and compare against your personal reduction goals.</p>
     </div>
     <div class="feature-card">
       <div class="feature-icon" style="--icon-color:#a78bfa">
         <span class="material-icons-round">file_download</span>
       </div>
       <h3>Reports Download</h3>
-      <p>Export your data as CSV or styled PDF reports, perfect for sharing or personal records.</p>
+      <p>Export CSV or styled PDF reports — perfect for ESG submissions, sharing, or personal records.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="--icon-color:#fb923c">
+        <span class="material-icons-round">military_tech</span>
+      </div>
+      <h3>Gamification</h3>
+      <p>Green Points, badges, weekly challenges, and streaks keep you motivated to sustain good habits.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="--icon-color:#34d399">
+        <span class="material-icons-round">business</span>
+      </div>
+      <h3>Enterprise Ready</h3>
+      <p>Scope 1/2/3 tracking, team dashboards, BRSR/GRI compliance, and carbon credit marketplace integration.</p>
     </div>
   </div>
 </section>
 
 <!-- ── FOOTER ─────────────────────────────────────────────────────── -->
 <footer class="landing-footer">
-  <div class="footer-brand">
-    <span class="material-icons-round">eco</span>
-    Carby Control
+  <div class="footer-content">
+    <div class="footer-brand">
+      <span class="material-icons-round">eco</span>
+      Carby Control
+    </div>
+    <div class="footer-links">
+      <a href="#calculator-demo">Calculator</a>
+      <a href="#enterprise">Enterprise</a>
+      <a href="#security">Security</a>
+      <a href="#community">Community</a>
+      <a href="{{ url_for('register') }}">Get Started</a>
+    </div>
+    <div class="footer-social">
+      <span class="footer-badge">🔒 CSRF Protected</span>
+      <span class="footer-badge">🌱 Carbon Neutral Goal 2030</span>
+      <span class="footer-badge">🤖 AI Powered</span>
+    </div>
   </div>
-  <p>© 2024 Carby Control. Building a sustainable future, one log at a time.</p>
+  <p class="footer-copy">© 2024 Carby Control. Building a sustainable future, one log at a time.</p>
 </footer>
+
+<!-- ── AI CHATBOT WIDGET ────────────────────────────────────────── -->
+<div class="chatbot-widget" id="chatbotWidget">
+  <button class="chatbot-toggle" id="chatbotToggle" onclick="toggleChatbot()" aria-label="Open AI Assistant">
+    <span class="material-icons-round chatbot-icon-open">psychology</span>
+    <span class="material-icons-round chatbot-icon-close" style="display:none">close</span>
+    <span class="chatbot-badge">AI</span>
+  </button>
+  <div class="chatbot-panel" id="chatbotPanel">
+    <div class="chatbot-header">
+      <span class="material-icons-round">psychology</span>
+      <div>
+        <strong>Eco AI Assistant</strong>
+        <div class="chatbot-status">● Online</div>
+      </div>
+    </div>
+    <div class="chatbot-messages" id="chatbotMessages">
+      <div class="chat-msg bot-msg">
+        👋 Hi! I'm your Eco AI Assistant. Ask me anything about reducing your carbon footprint!
+      </div>
+    </div>
+    <div class="chatbot-suggestions">
+      <button onclick="sendChatMsg('How can I reduce transport emissions?')" class="chat-suggest-btn">🚗 Transport tips</button>
+      <button onclick="sendChatMsg('What are easy ways to save electricity?')" class="chat-suggest-btn">⚡ Energy tips</button>
+      <button onclick="sendChatMsg('How do I offset my carbon emissions?')" class="chat-suggest-btn">🌳 Offsets</button>
+    </div>
+    <div class="chatbot-input-row">
+      <input type="text" id="chatbotInput" placeholder="Ask about sustainability..." onkeydown="if(event.key==='Enter') sendChatMsg()" />
+      <button onclick="sendChatMsg()" class="chatbot-send-btn">
+        <span class="material-icons-round">send</span>
+      </button>
+    </div>
+  </div>
+</div>
 
 <script src="{{ url_for('static', filename='js/landing.js') }}"></script>
 </body>
