@@ -1,8 +1,11 @@
-﻿import os
+import os
 
 class Config:
     # Flask
     SECRET_KEY = os.environ.get('SECRET_KEY', 'Carby Control-otp-secret-2024')
+
+    # ── Gemini AI ─────────────────────────────────────────────────
+    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')  # Set in Vercel env vars
 
     # Vercel Postgres
     POSTGRES_URL   = os.environ.get('POSTGRES_URL')

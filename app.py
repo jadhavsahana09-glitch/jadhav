@@ -63,7 +63,8 @@ def validate_csrf_token():
 @app.before_request
 def enforce_csrf():
     if request.method == 'POST' and request.endpoint not in {'static'}:
-        if request.endpoint in {'reports_download_csv', 'reports_download_pdf'}:
+        if request.endpoint in {'reports_download_csv', 'reports_download_pdf',
+                                 'api_chatbot', 'api_calculator_save'}:
             return
         if not validate_csrf_token():
             flash('Your session token expired. Please refresh and try again.', 'warning')
@@ -1035,7 +1036,29 @@ def api_chatbot():
 
 
 def get_bot_reply(msg: str) -> str:
-    """Rule-based eco AI responses — replace body with Gemini API for real AI."""
+    """Call Gemini AI for eco responses; fall back to rule-based if API key missing/fails."""
+
+    # ── Gemini AI path ───────────────────────────────────────────────────────────
+    api_key = app.config.get('GEMINI_API_KEY', '')
+    if api_key:
+        try:
+            import google.generativeai as genai
+            genai.configure(api_key=api_key)
+            model = genai.GenerativeModel('gemini-1.5-flash')
+            prompt = (
+                "You are Carby, a friendly eco-sustainability AI assistant for Carby Control — "
+                "a carbon footprint tracker app. Give a concise, helpful answer in 2-3 sentences. "
+                "Focus on practical carbon reduction tips, data, and encouragement. "
+                "Use 1 relevant emoji at the start. "
+                f"User message: {msg}"
+            )
+            response = model.generate_content(prompt)
+            return response.text.strip()
+        except Exception as e:
+            app.logger.error(f'Gemini API error: {e}')
+            # Fall through to rule-based fallback below
+
+    # ── Rule-based fallback ──────────────────────────────────────────────────────
     responses = {
         ('transport', 'car', 'commute', 'drive', 'bus', 'train'):
             "🚗 Transport Tip: Use public transport 2–3×/week to save ~12 kg CO₂/month. "
