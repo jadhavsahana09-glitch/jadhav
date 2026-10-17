@@ -186,6 +186,13 @@
         <span>Estimated daily footprint</span>
         <strong id="demoTotal">0.00 kg CO₂</strong>
       </div>
+      <!-- Save to Dashboard button — calls /api/calculator-save -->
+      <button class="btn btn-primary" id="saveCalcBtn" onclick="saveCalculatorToDashboard()"
+              style="width:100%;margin-top:10px;justify-content:center;" title="Saves today's values as emission logs">
+        <span class="material-icons-round">save</span>
+        Save to My Dashboard
+      </button>
+      <div id="saveCalcMsg" style="display:none;text-align:center;font-size:12px;margin-top:6px;"></div>
       <div class="emission-mini-chart-wrap">
         <canvas id="demoBarChart" height="120"></canvas>
       </div>

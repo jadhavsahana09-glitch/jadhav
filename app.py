@@ -1015,6 +1015,113 @@ def health():
     return {"status": "ok", "db_mode": DB_MODE, "csrf": "active", "otp_auth": "active"}
 
 
+# ─── Chatbot API (Backend AI — future Gemini-ready) ──────────────────────────
+@app.route('/api/chatbot', methods=['POST'])
+def api_chatbot():
+    """
+    Rule-based AI chatbot endpoint.
+    Accepts: { "message": "How do I reduce transport emissions?" }
+    Returns: { "reply": "..." }
+    Future upgrade: replace get_bot_reply() with a Gemini/OpenAI API call.
+    """
+    data = request.get_json(silent=True) or {}
+    msg  = data.get('message', '').strip().lower()
+
+    if not msg:
+        return {'reply': 'Please ask me something about sustainability!'}, 400
+
+    reply = get_bot_reply(msg)
+    return {'reply': reply}
+
+
+def get_bot_reply(msg: str) -> str:
+    """Rule-based eco AI responses — replace body with Gemini API for real AI."""
+    responses = {
+        ('transport', 'car', 'commute', 'drive', 'bus', 'train'):
+            "🚗 Transport Tip: Use public transport 2–3×/week to save ~12 kg CO₂/month. "
+            "Carpooling halves per-person emissions. For trips under 3 km, walk or cycle.",
+
+        ('electricity', 'energy', 'power', 'bulb', 'appliance', 'kwh'):
+            "⚡ Energy Tip: Switch to LED bulbs (75% less energy), unplug standby devices, "
+            "and use appliances during off-peak hours. Set AC to 24–26°C.",
+
+        ('food', 'meat', 'eat', 'diet', 'veg', 'vegetarian'):
+            "🍖 Food Tip: 1 kg of beef = 27 kg CO₂; lentils = 0.9 kg. "
+            "Try Meatless Monday — reduces food footprint by 15%. Buy local and seasonal.",
+
+        ('shop', 'buy', 'purchase', 'fashion', 'clothes'):
+            "🛍️ Shopping Tip: Fast fashion = 10% of global CO₂. "
+            "Buy second-hand, choose quality over quantity, and repair instead of replace.",
+
+        ('offset', 'tree', 'ngo', 'credit', 'neutral'):
+            "🌳 Carbon Offsets: 1 tree absorbs ~21 kg CO₂/year. "
+            "Partner with Green Yatra, Blue Carbon, or Barefoot College via Carby Control.",
+
+        ('goal', 'target', 'reduce', 'plan'):
+            "🎯 Set a 10% monthly reduction goal — achievable and measurable. "
+            "Track daily to spot patterns. Most people are surprised by transport emissions.",
+
+        ('company', 'business', 'enterprise', 'esg', 'scope', 'brsr'):
+            "🏢 Enterprise: Track Scope 1/2/3, generate BRSR/GRI reports, "
+            "set team dashboards, and get AI forecasting on Carby Control Enterprise.",
+
+        ('security', 'safe', 'privacy', 'data', 'csrf', 'otp'):
+            "🔒 Security: CSRF on all forms, OTP auth (no passwords stored), "
+            "256-bit session encryption, parameterized SQL, HTTPS via Vercel SSL.",
+
+        ('start', 'begin', 'new', 'first', 'how'):
+            "🌱 Getting Started: 1) Calculate your baseline above. "
+            "2) Identify top 2 sources. 3) Set a 10% goal. 4) Log daily. 5) Join challenges!",
+    }
+
+    for keywords, response in responses.items():
+        if any(k in msg for k in keywords):
+            return response
+
+    return ("🌍 I can help with: 🚗 Transport · ⚡ Energy · 🍖 Food · 🛍️ Shopping · "
+            "🌳 Offsets · 🎯 Goals · 🏢 Enterprise · 🔒 Security. What would you like to know?")
+
+
+# ─── Calculator Save API (saves demo result as emission log if logged in) ──────
+@app.route('/api/calculator-save', methods=['POST'])
+@login_required
+def api_calculator_save():
+    """
+    Saves the landing calculator values directly as emission logs for today.
+    Accepts: { transport_km, electricity_kwh, food_meals, shopping_usd }
+    """
+    data = request.get_json(silent=True) or {}
+
+    factors = {
+        'Transport': ('directions_car', float(data.get('transport_km', 0))  * 0.21),
+        'Energy':    ('bolt',           float(data.get('electricity_kwh', 0)) * 0.23),
+        'Food':      ('restaurant',     float(data.get('food_meals', 0))    * 3.10),
+        'Shopping':  ('shopping_bag',   float(data.get('shopping_usd', 0))  * 0.03),
+    }
+
+    today = date.today().isoformat()
+    saved = []
+
+    try:
+        db  = get_db(); cur = db.cursor(dictionary=True)
+        for cat_name, (icon, amount) in factors.items():
+            if amount <= 0:
+                continue
+            cur.execute("SELECT id FROM categories WHERE name = %s", (cat_name,))
+            row = cur.fetchone()
+            if row:
+                cur.execute("""
+                    INSERT INTO emission_logs (user_id, category_id, amount, description, log_date)
+                    VALUES (%s, %s, %s, %s, %s)
+                """, (current_user.id, row['id'], round(amount, 3), 'Saved from calculator', today))
+                saved.append({'category': cat_name, 'amount': round(amount, 3)})
+        db.commit(); cur.close(); db.close()
+        return {'success': True, 'saved': saved, 'date': today}
+    except Exception as e:
+        app.logger.error(f'Calculator save error: {e}')
+        return {'success': False, 'error': 'Could not save logs.'}, 500
+
+
 # ─── Tracker ──────────────────────────────────────────────────────────────────
 @app.route('/tracker', methods=['GET', 'POST'])
 @login_required

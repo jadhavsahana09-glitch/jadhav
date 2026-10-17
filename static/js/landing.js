@@ -378,32 +378,100 @@ function sendChatMsg(text) {
   userDiv.textContent = msg;
   messages.appendChild(userDiv);
 
-  // Bot typing indicator
+  // Typing indicator
   const typingDiv = document.createElement('div');
   typingDiv.className = 'chat-msg bot-msg chat-typing';
   typingDiv.innerHTML = '<span></span><span></span><span></span>';
   messages.appendChild(typingDiv);
   messages.scrollTop = messages.scrollHeight;
 
-  // Bot response after short delay
-  setTimeout(() => {
+  // ── Try backend first, fallback to client-side ──────────────────
+  fetch('/api/chatbot', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: msg })
+  })
+  .then(res => res.ok ? res.json() : null)
+  .then(data => {
     messages.removeChild(typingDiv);
     const botDiv = document.createElement('div');
     botDiv.className = 'chat-msg bot-msg';
-    // Convert newlines & **bold** to HTML
+    const reply = data?.reply || getChatResponse(msg);  // fallback to client-side
+    botDiv.innerHTML = reply
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br>');
+    messages.appendChild(botDiv);
+    messages.scrollTop = messages.scrollHeight;
+  })
+  .catch(() => {
+    // Network error — use client-side fallback
+    messages.removeChild(typingDiv);
+    const botDiv = document.createElement('div');
+    botDiv.className = 'chat-msg bot-msg';
     botDiv.innerHTML = getChatResponse(msg)
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\n/g, '<br>');
     messages.appendChild(botDiv);
     messages.scrollTop = messages.scrollHeight;
-  }, 800);
+  });
 }
 
 // ── Initialize everything ────────────────────────────────────────
 initLandingCharts();
 updateLandingDemo();
 
-// Animate security threat meter on scroll into view
+// ── Save Calculator to Dashboard ─────────────────────────────────
+function saveCalculatorToDashboard() {
+  const btn    = document.getElementById('saveCalcBtn');
+  const msgEl  = document.getElementById('saveCalcMsg');
+
+  const transport_km    = parseFloat(demoInputs.transport?.value)   || 0;
+  const electricity_kwh = parseFloat(demoInputs.electricity?.value) || 0;
+  const food_meals      = parseFloat(demoInputs.food?.value)        || 0;
+  const shopping_usd    = parseFloat(demoInputs.shopping?.value)    || 0;
+
+  if (!transport_km && !electricity_kwh && !food_meals && !shopping_usd) {
+    if (msgEl) { msgEl.textContent = '⚠️ Enter at least one value first.'; msgEl.style.display = 'block'; msgEl.style.color = '#f97316'; }
+    return;
+  }
+
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="material-icons-round">hourglass_empty</span> Saving...'; }
+
+  fetch('/api/calculator-save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ transport_km, electricity_kwh, food_meals, shopping_usd })
+  })
+  .then(res => {
+    if (res.status === 401) {
+      // Not logged in — redirect to register
+      if (msgEl) { msgEl.textContent = '🔐 Please log in first to save.'; msgEl.style.display = 'block'; msgEl.style.color = '#f97316'; }
+      setTimeout(() => { window.location.href = '/login'; }, 1500);
+      return null;
+    }
+    return res.json();
+  })
+  .then(data => {
+    if (!data) return;
+    if (data.success) {
+      if (msgEl) {
+        msgEl.textContent = `✅ Saved ${data.saved.length} categories to your dashboard!`;
+        msgEl.style.display = 'block';
+        msgEl.style.color = '#22c55e';
+      }
+      if (btn) { btn.innerHTML = '<span class="material-icons-round">check_circle</span> Saved!'; btn.style.background = '#22c55e'; }
+      setTimeout(() => { window.location.href = '/dashboard'; }, 1800);
+    } else {
+      if (msgEl) { msgEl.textContent = '❌ ' + (data.error || 'Save failed.'); msgEl.style.display = 'block'; msgEl.style.color = '#ef4444'; }
+      if (btn) { btn.disabled = false; btn.innerHTML = '<span class="material-icons-round">save</span> Save to My Dashboard'; }
+    }
+  })
+  .catch(() => {
+    if (msgEl) { msgEl.textContent = '🔐 Log in to save your results.'; msgEl.style.display = 'block'; msgEl.style.color = '#f97316'; }
+    setTimeout(() => { window.location.href = '/login'; }, 1500);
+    if (btn) { btn.disabled = false; btn.innerHTML = '<span class="material-icons-round">save</span> Save to My Dashboard'; }
+  });
+}
 const threatFill = document.querySelector('.threat-meter-fill');
 if (threatFill) {
   const observer = new IntersectionObserver(entries => {
